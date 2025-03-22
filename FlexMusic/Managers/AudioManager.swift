@@ -1,6 +1,15 @@
+//
+//  FlexMusicApp.swift
+//  FlexMusic
+//
+//  Created by Aleks Synelnyk on 18.03.2025.
+//
+
+
 import Foundation
 import AVFoundation
 import CoreData
+import MediaPlayer
 
 class AudioManager: NSObject, ObservableObject {
     static let shared = AudioManager()
@@ -19,6 +28,7 @@ class AudioManager: NSObject, ObservableObject {
     private override init() {
         super.init()
         setupAudioSession()
+        setupRemoteCommands()
     }
     
     private func setupAudioSession() {
@@ -97,6 +107,9 @@ class AudioManager: NSObject, ObservableObject {
                     song.duration = duration
                     try? song.managedObjectContext?.save()
                 }
+                
+                // Обновляем информацию о текущем треке
+                updateNowPlayingInfo()
             } else {
                 print("Failed to start playback")
             }
@@ -131,6 +144,66 @@ class AudioManager: NSObject, ObservableObject {
             startTimer()
         }
         isPlaying.toggle()
+        updateNowPlayingInfo() // Обновляем информацию о треке
+    }
+    
+    func updateNowPlayingInfo() {
+        guard let song = currentSong else { return }
+        
+        print("Updating Now Playing Info for song: \(song.title ?? "Unknown")")
+        
+        var nowPlayingInfo: [String: Any] = [
+            MPMediaItemPropertyTitle: song.title ?? "Unknown",
+            MPMediaItemPropertyArtist: song.artist ?? "Unknown",
+            MPMediaItemPropertyPlaybackDuration: totalTime,
+            MPNowPlayingInfoPropertyElapsedPlaybackTime: currentTime,
+            MPNowPlayingInfoPropertyPlaybackRate: isPlaying ? 1.0 : 0.0
+        ]
+        
+        // Загружаем обложку из данных песни
+        if let coverImageData = song.coverImageData, let image = UIImage(data: coverImageData) {
+            print("Artwork data found, size: \(coverImageData.count) bytes")
+            print("Artwork image size: \(image.size)")
+            
+            let artwork = MPMediaItemArtwork(boundsSize: image.size) { _ in return image }
+            nowPlayingInfo[MPMediaItemPropertyArtwork] = artwork
+            
+            print("Artwork added to Now Playing Info")
+        } else {
+            print("No artwork data found for the song")
+        }
+        
+        MPNowPlayingInfoCenter.default().nowPlayingInfo = nowPlayingInfo
+        print("Now Playing Info updated")
+    }
+    
+    func setupRemoteCommands() {
+        let commandCenter = MPRemoteCommandCenter.shared()
+        
+        commandCenter.playCommand.addTarget { [weak self] _ in
+            self?.togglePlayPause()
+            return .success
+        }
+        commandCenter.pauseCommand.addTarget { [weak self] _ in
+            self?.togglePlayPause()
+            return .success
+        }
+        commandCenter.nextTrackCommand.addTarget { [weak self] _ in
+            self?.playNextTrack()
+            return .success
+        }
+        commandCenter.previousTrackCommand.addTarget { [weak self] _ in
+            self?.playPreviousTrack()
+            return .success
+        }
+        commandCenter.seekForwardCommand.addTarget { [weak self] _ in
+            self?.skipForward()
+            return .success
+        }
+        commandCenter.seekBackwardCommand.addTarget { [weak self] _ in
+            self?.skipBackward()
+            return .success
+        }
     }
     
     func seekAudio(to time: TimeInterval) {
@@ -151,12 +224,14 @@ class AudioManager: NSObject, ObservableObject {
     func playNextTrack() {
         if let nextSong = PlaylistManager.shared.playNext() {
             playSong(nextSong)
+            updateNowPlayingInfo()
         }
     }
     
     func playPreviousTrack() {
         if let previousSong = PlaylistManager.shared.playPrevious() {
             playSong(previousSong)
+            updateNowPlayingInfo()
         }
     }
     
@@ -219,4 +294,4 @@ enum RepeatMode {
     case none
     case all
     case one
-} 
+}
