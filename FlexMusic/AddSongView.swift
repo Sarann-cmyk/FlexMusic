@@ -126,6 +126,10 @@ struct AddSongView: View {
             newSong.coverImageData = image.jpegData(compressionQuality: 0.8)
         }
         
+        if let imageData = selectedImage?.jpegData(compressionQuality: 0.8) {
+            newSong.artwork = imageData
+        }
+        
         do {
             try viewContext.save()
         } catch {
