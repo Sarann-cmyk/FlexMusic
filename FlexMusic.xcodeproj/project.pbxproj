@@ -7,19 +7,32 @@
 	objects = {
 
 /* Begin PBXFileReference section */
-		E28BC2652D8EDF55004FEC5B /* FlexMusic.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FlexMusic.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		E260A5D02D898C98008D4ECB /* FlexMusic.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FlexMusic.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		E260A5E92D898E00008D4ECB /* Exceptions for "FlexMusic" folder in "FlexMusic" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = E260A5CF2D898C98008D4ECB /* FlexMusic */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
-		E28BC2672D8EDF55004FEC5B /* FlexMusic */ = {
+		E260A5D22D898C98008D4ECB /* FlexMusic */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				E260A5E92D898E00008D4ECB /* Exceptions for "FlexMusic" folder in "FlexMusic" target */,
+			);
 			path = FlexMusic;
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
-		E28BC2622D8EDF55004FEC5B /* Frameworks */ = {
+		E260A5CD2D898C98008D4ECB /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -29,18 +42,18 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		E28BC25C2D8EDF55004FEC5B = {
+		E260A5C72D898C98008D4ECB = {
 			isa = PBXGroup;
 			children = (
-				E28BC2672D8EDF55004FEC5B /* FlexMusic */,
-				E28BC2662D8EDF55004FEC5B /* Products */,
+				E260A5D22D898C98008D4ECB /* FlexMusic */,
+				E260A5D12D898C98008D4ECB /* Products */,
 			);
 			sourceTree = "<group>";
 		};
-		E28BC2662D8EDF55004FEC5B /* Products */ = {
+		E260A5D12D898C98008D4ECB /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				E28BC2652D8EDF55004FEC5B /* FlexMusic.app */,
+				E260A5D02D898C98008D4ECB /* FlexMusic.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -48,64 +61,64 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		E28BC2642D8EDF55004FEC5B /* FlexMusic */ = {
+		E260A5CF2D898C98008D4ECB /* FlexMusic */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = E28BC2782D8EDF56004FEC5B /* Build configuration list for PBXNativeTarget "FlexMusic" */;
+			buildConfigurationList = E260A5DE2D898C98008D4ECB /* Build configuration list for PBXNativeTarget "FlexMusic" */;
 			buildPhases = (
-				E28BC2612D8EDF55004FEC5B /* Sources */,
-				E28BC2622D8EDF55004FEC5B /* Frameworks */,
-				E28BC2632D8EDF55004FEC5B /* Resources */,
+				E260A5CC2D898C98008D4ECB /* Sources */,
+				E260A5CD2D898C98008D4ECB /* Frameworks */,
+				E260A5CE2D898C98008D4ECB /* Resources */,
 			);
 			buildRules = (
 			);
 			dependencies = (
 			);
 			fileSystemSynchronizedGroups = (
-				E28BC2672D8EDF55004FEC5B /* FlexMusic */,
+				E260A5D22D898C98008D4ECB /* FlexMusic */,
 			);
 			name = FlexMusic;
 			packageProductDependencies = (
 			);
 			productName = FlexMusic;
-			productReference = E28BC2652D8EDF55004FEC5B /* FlexMusic.app */;
+			productReference = E260A5D02D898C98008D4ECB /* FlexMusic.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
-		E28BC25D2D8EDF55004FEC5B /* Project object */ = {
+		E260A5C82D898C98008D4ECB /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
 				LastSwiftUpdateCheck = 1620;
 				LastUpgradeCheck = 1620;
 				TargetAttributes = {
-					E28BC2642D8EDF55004FEC5B = {
+					E260A5CF2D898C98008D4ECB = {
 						CreatedOnToolsVersion = 16.2;
 					};
 				};
 			};
-			buildConfigurationList = E28BC2602D8EDF55004FEC5B /* Build configuration list for PBXProject "FlexMusic" */;
+			buildConfigurationList = E260A5CB2D898C98008D4ECB /* Build configuration list for PBXProject "FlexMusic" */;
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
 				en,
 				Base,
 			);
-			mainGroup = E28BC25C2D8EDF55004FEC5B;
+			mainGroup = E260A5C72D898C98008D4ECB;
 			minimizedProjectReferenceProxies = 1;
 			preferredProjectObjectVersion = 77;
-			productRefGroup = E28BC2662D8EDF55004FEC5B /* Products */;
+			productRefGroup = E260A5D12D898C98008D4ECB /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				E28BC2642D8EDF55004FEC5B /* FlexMusic */,
+				E260A5CF2D898C98008D4ECB /* FlexMusic */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
-		E28BC2632D8EDF55004FEC5B /* Resources */ = {
+		E260A5CE2D898C98008D4ECB /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -115,7 +128,7 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
-		E28BC2612D8EDF55004FEC5B /* Sources */ = {
+		E260A5CC2D898C98008D4ECB /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -125,7 +138,7 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin XCBuildConfiguration section */
-		E28BC2762D8EDF56004FEC5B /* Debug */ = {
+		E260A5DC2D898C98008D4ECB /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
@@ -188,7 +201,7 @@
 			};
 			name = Debug;
 		};
-		E28BC2772D8EDF56004FEC5B /* Release */ = {
+		E260A5DD2D898C98008D4ECB /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
@@ -244,7 +257,7 @@
 			};
 			name = Release;
 		};
-		E28BC2792D8EDF56004FEC5B /* Debug */ = {
+		E260A5DF2D898C98008D4ECB /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
@@ -255,6 +268,7 @@
 				DEVELOPMENT_TEAM = 9CYR3K5YHR;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = FlexMusic/Info.plist;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -273,7 +287,7 @@
 			};
 			name = Debug;
 		};
-		E28BC27A2D8EDF56004FEC5B /* Release */ = {
+		E260A5E02D898C98008D4ECB /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
@@ -284,6 +298,7 @@
 				DEVELOPMENT_TEAM = 9CYR3K5YHR;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = FlexMusic/Info.plist;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -305,25 +320,25 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		E28BC2602D8EDF55004FEC5B /* Build configuration list for PBXProject "FlexMusic" */ = {
+		E260A5CB2D898C98008D4ECB /* Build configuration list for PBXProject "FlexMusic" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				E28BC2762D8EDF56004FEC5B /* Debug */,
-				E28BC2772D8EDF56004FEC5B /* Release */,
+				E260A5DC2D898C98008D4ECB /* Debug */,
+				E260A5DD2D898C98008D4ECB /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		E28BC2782D8EDF56004FEC5B /* Build configuration list for PBXNativeTarget "FlexMusic" */ = {
+		E260A5DE2D898C98008D4ECB /* Build configuration list for PBXNativeTarget "FlexMusic" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				E28BC2792D8EDF56004FEC5B /* Debug */,
-				E28BC27A2D8EDF56004FEC5B /* Release */,
+				E260A5DF2D898C98008D4ECB /* Debug */,
+				E260A5E02D898C98008D4ECB /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
-	rootObject = E28BC25D2D8EDF55004FEC5B /* Project object */;
+	rootObject = E260A5C82D898C98008D4ECB /* Project object */;
 }

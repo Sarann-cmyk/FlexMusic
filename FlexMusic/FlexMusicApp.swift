@@ -2,7 +2,7 @@
 //  FlexMusicApp.swift
 //  FlexMusic
 //
-//  Created by Aleks Synelnyk on 22.03.2025.
+//  Created by Aleks Synelnyk on 18.03.2025.
 //
 
 import SwiftUI
@@ -10,7 +10,7 @@ import SwiftUI
 @main
 struct FlexMusicApp: App {
     let persistenceController = PersistenceController.shared
-
+    
     var body: some Scene {
         WindowGroup {
             ContentView()
