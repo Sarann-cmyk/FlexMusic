@@ -204,11 +204,18 @@ class AudioManager: NSObject, ObservableObject {
             self?.skipBackward()
             return .success
         }
+
+        commandCenter.changePlaybackPositionCommand.addTarget { [weak self] event in
+            guard let event = event as? MPChangePlaybackPositionCommandEvent else { return .commandFailed }
+            self?.seekAudio(to: event.positionTime)
+            return .success
+        }
     }
     
     func seekAudio(to time: TimeInterval) {
         player?.currentTime = time
         currentTime = time
+        updateNowPlayingInfo()
     }
     
     func skipForward() {
