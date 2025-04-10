@@ -41,6 +41,7 @@ extension Color {
 
 struct LibraryView: View {
     @Environment(\.managedObjectContext) private var viewContext
+    @Environment(\.colorScheme) private var colorScheme
     @FetchRequest(
         sortDescriptors: [NSSortDescriptor(keyPath: \Playlist.createdAt, ascending: false)],
         animation: .default)
@@ -54,6 +55,15 @@ struct LibraryView: View {
     private let columns = [
         GridItem(.adaptive(minimum: 110, maximum: 150), spacing: 20)
     ]
+    
+    // Кольори залежні від теми
+    var textColor: Color {
+        colorScheme == .dark ? .white : .black
+    }
+    
+    var secondaryTextColor: Color {
+        colorScheme == .dark ? .white.opacity(0.7) : .black.opacity(0.7)
+    }
     
     private func randomColor() -> Color {
         let colors: [Color] = [
@@ -131,7 +141,7 @@ struct LibraryView: View {
             .aspectRatio(1, contentMode: .fit)
             .overlay(
                 RoundedRectangle(cornerRadius: 12)
-                    .stroke(Color.white.opacity(0.2), lineWidth: 0.5)
+                    .stroke(colorScheme == .dark ? Color.white.opacity(0.2) : Color.black.opacity(0.1), lineWidth: 0.5)
             )
             .contextMenu {
                 Button(role: .destructive) {
@@ -143,12 +153,12 @@ struct LibraryView: View {
             
             VStack(spacing: 2) {
                 Text(playlist.name ?? "")
-                    .foregroundColor(.white)
+                    .foregroundColor(textColor)
                     .font(.system(size: 14, weight: .medium))
                     .lineLimit(1)
                 
                 Text("\(playlist.songsArray.count) songs")
-                    .foregroundColor(.white.opacity(0.7))
+                    .foregroundColor(secondaryTextColor)
                     .font(.system(size: 12))
                     .lineLimit(1)
             }
@@ -239,29 +249,29 @@ struct LibraryView: View {
                     VStack {
                         Image(systemName: "plus.circle.fill")
                             .font(.system(size: 36))
-                            .foregroundColor(.white)
+                            .foregroundColor(colorScheme == .dark ? .white : .black.opacity(0.7))
                             .shadow(color: .black.opacity(0.3), radius: 2, x: 0, y: 1)
                         
                         Text("Create Playlist")
                             .font(.system(size: 12, weight: .medium))
-                            .foregroundColor(.white)
+                            .foregroundColor(textColor)
                             .padding(.top, 8)
                     }
                 }
                 .aspectRatio(1, contentMode: .fit)
                 .overlay(
                     RoundedRectangle(cornerRadius: 12)
-                        .stroke(Color.white.opacity(0.2), lineWidth: 0.5)
+                        .stroke(colorScheme == .dark ? Color.white.opacity(0.2) : Color.black.opacity(0.1), lineWidth: 0.5)
                 )
                 
                 VStack(spacing: 2) {
                     Text("New Playlist")
-                        .foregroundColor(.white)
+                        .foregroundColor(textColor)
                         .font(.system(size: 14, weight: .medium))
                         .lineLimit(1)
                     
                     Text("Add songs")
-                        .foregroundColor(.white.opacity(0.7))
+                        .foregroundColor(secondaryTextColor)
                         .font(.system(size: 12))
                         .lineLimit(1)
                 }
@@ -289,7 +299,7 @@ struct LibraryView: View {
                     VStack(alignment: .leading) {
                         Text("Your Library")
                             .font(.system(size: 22, weight: .bold))
-                            .foregroundColor(.white)
+                            .foregroundColor(textColor)
                             .padding(.horizontal)
                             .padding(.top, 10)
                             .padding(.bottom, 4)
