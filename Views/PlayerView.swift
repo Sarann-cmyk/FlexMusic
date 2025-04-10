@@ -13,6 +13,7 @@ struct PlayerView: View {
     @StateObject private var audioManager = AudioManager.shared
     @StateObject private var playlistManager = PlaylistManager.shared
     @EnvironmentObject private var themeManager: ThemeManager
+    @Environment(\.colorScheme) private var colorScheme
     @State private var showingSleepPicker = false
     @State private var selectedSleepTime: TimeInterval = 0
     @State private var showingSpeedPicker = false
@@ -30,6 +31,31 @@ struct PlayerView: View {
     ]
     
     private let playbackRates: [Double] = [0.5, 0.75, 1.0, 1.25, 1.5, 1.75, 2.0]
+    
+    // Кольори залежні від теми
+    var textColor: Color {
+        if themeManager.playerBackgroundMode == .dynamic && dominantColor != nil {
+            return .white
+        } else {
+            return colorScheme == .dark ? .white : .black
+        }
+    }
+    
+    var secondaryTextColor: Color {
+        if themeManager.playerBackgroundMode == .dynamic && dominantColor != nil {
+            return .white.opacity(0.7)
+        } else {
+            return colorScheme == .dark ? .white.opacity(0.7) : .black.opacity(0.7)
+        }
+    }
+    
+    var controlsColor: Color {
+        if themeManager.playerBackgroundMode == .dynamic && dominantColor != nil {
+            return .white
+        } else {
+            return colorScheme == .dark ? .white : .black
+        }
+    }
     
     var body: some View {
         NavigationView {
@@ -100,14 +126,14 @@ struct PlayerView: View {
                         Text(audioManager.currentSong?.title ?? "No Song Selected")
                             .font(.title3)
                             .fontWeight(.bold)
-                            .foregroundColor(.white)
+                            .foregroundColor(textColor)
                             .multilineTextAlignment(.center)
                             .lineLimit(2)
                             .minimumScaleFactor(0.8)
                         
                         Text(audioManager.currentSong?.artist ?? "Unknown Artist")
                             .font(.body)
-                            .foregroundColor(.white.opacity(0.7))
+                            .foregroundColor(secondaryTextColor)
                             .multilineTextAlignment(.center)
                             .lineLimit(1)
                             .minimumScaleFactor(0.8)
@@ -122,18 +148,18 @@ struct PlayerView: View {
                             get: { audioManager.currentTime },
                             set: { audioManager.seekAudio(to: $0) }
                         ), in: 0...audioManager.totalTime)
-                            .accentColor(.white)
+                            .accentColor(controlsColor)
                         
                         HStack {
                             Text(formatTime(audioManager.currentTime))
                                 .font(.caption)
-                                .foregroundColor(.white.opacity(0.7))
+                                .foregroundColor(secondaryTextColor)
                             
                             Spacer()
                             
                             Text(formatTime(audioManager.totalTime))
                                 .font(.caption)
-                                .foregroundColor(.white.opacity(0.7))
+                                .foregroundColor(secondaryTextColor)
                         }
                     }
                     .padding(.horizontal)
@@ -144,31 +170,31 @@ struct PlayerView: View {
                             Button(action: { audioManager.skipBackward() }) {
                                 Image(systemName: "gobackward.10")
                                     .font(.title2)
-                                    .foregroundColor(.white)
+                                    .foregroundColor(controlsColor)
                             }
 
                             Button(action: { audioManager.playPreviousTrack() }) {
                                 Image(systemName: "backward.fill")
                                     .font(.title)
-                                    .foregroundColor(.white)
+                                    .foregroundColor(controlsColor)
                             }
 
                             Button(action: { audioManager.togglePlayPause() }) {
                                 Image(systemName: audioManager.isPlaying ? "pause.circle.fill" : "play.circle.fill")
                                     .font(.system(size: 55))
-                                    .foregroundColor(.white)
+                                    .foregroundColor(controlsColor)
                             }   
                             
                             Button(action: { audioManager.playNextTrack() }) {
                                 Image(systemName: "forward.fill")
                                     .font(.title)
-                                    .foregroundColor(.white)
+                                    .foregroundColor(controlsColor)
                             }
                             
                             Button(action: { audioManager.skipForward() }) {
                                 Image(systemName: "goforward.10")
                                     .font(.title2)
-                                    .foregroundColor(.white)
+                                    .foregroundColor(controlsColor)
                             }
                         }
                         
@@ -182,7 +208,7 @@ struct PlayerView: View {
                                 VStack(spacing: 2) {
                                     Image(systemName: selectedSleepTime > 0 ? "timer" : "timer.circle")
                                         .font(.system(size: 28))
-                                        .foregroundColor(selectedSleepTime > 0 ? .green : .white)
+                                        .foregroundColor(selectedSleepTime > 0 ? .green : controlsColor)
                                     if selectedSleepTime > 0 {
                                         Text(formatSleepTime(selectedSleepTime))
                                             .font(.caption2)
@@ -192,7 +218,7 @@ struct PlayerView: View {
                                             .frame(height: 12)
                                     }
                                 }
-                                .frame(width: 60, height: 45)  // Фиксированная ширина и высота
+                                .frame(width: 60, height: 45)
                                 .contentShape(Rectangle())
                             }
                             
@@ -201,11 +227,11 @@ struct PlayerView: View {
                                 VStack(spacing: 2) {
                                     Image(systemName: audioManager.currentSong?.isFavorite ?? false ? "heart.fill" : "heart")
                                         .font(.system(size: 28))
-                                        .foregroundColor(audioManager.currentSong?.isFavorite ?? false ? .pink : .white)
+                                        .foregroundColor(audioManager.currentSong?.isFavorite ?? false ? .pink : controlsColor)
                                     Color.clear
                                         .frame(height: 12)
                                 }
-                                .frame(width: 60, height: 45)  // Фиксированная ширина и высота
+                                .frame(width: 60, height: 45)
                                 .contentShape(Rectangle())
                             }
                             
@@ -214,7 +240,7 @@ struct PlayerView: View {
                                 VStack(spacing: 2) {
                                     Image(systemName: "speedometer")
                                         .font(.system(size: 28))
-                                        .foregroundColor(currentPlaybackRate != 1.0 ? .blue : .white)
+                                        .foregroundColor(currentPlaybackRate != 1.0 ? .blue : controlsColor)
                                     if currentPlaybackRate != 1.0 {
                                         Text(String(format: "%.2fx", currentPlaybackRate))
                                             .font(.caption2)
@@ -224,7 +250,7 @@ struct PlayerView: View {
                                             .frame(height: 12)
                                     }
                                 }
-                                .frame(width: 60, height: 45)  // Фиксированная ширина и высота
+                                .frame(width: 60, height: 45)
                                 .contentShape(Rectangle())
                             }
                         }
@@ -330,11 +356,20 @@ struct PlayerView: View {
     struct SleepTimerSheet: View {
         @Binding var isPresented: Bool
         @Binding var selectedTime: TimeInterval
+        @Environment(\.colorScheme) private var colorScheme
         var onTimerSet: (TimeInterval) -> Void
+        
+        var textColor: Color {
+            colorScheme == .dark ? .white : .black
+        }
+        
+        var secondaryTextColor: Color {
+            colorScheme == .dark ? .white.opacity(0.7) : .black.opacity(0.7)
+        }
         
         var body: some View {
             ZStack {
-                // Используем тот же градиент, что и в основном view
+                // Використовуємо тот же градієнт, що і в основному view
                 LinearGradient(
                     gradient: Gradient(colors: [
                         Color("topBacground"),
@@ -349,12 +384,12 @@ struct PlayerView: View {
                     Text("Sleep Timer")
                         .font(.title2)
                         .fontWeight(.bold)
-                        .foregroundColor(.white)
+                        .foregroundColor(textColor)
                         .padding(.top, 20)
                     
                     Text("Music will stop playing after selected time")
                         .font(.subheadline)
-                        .foregroundColor(.white.opacity(0.7))
+                        .foregroundColor(secondaryTextColor)
                         .multilineTextAlignment(.center)
                         .padding(.horizontal)
                     
@@ -374,7 +409,7 @@ struct PlayerView: View {
                     Button("Cancel") {
                         isPresented = false
                     }
-                    .foregroundColor(.white)
+                    .foregroundColor(textColor)
                     .padding(.bottom, 30)
                 }
             }
@@ -388,7 +423,7 @@ struct PlayerView: View {
             } label: {
                 HStack {
                     Text(title)
-                        .foregroundColor(.white)
+                        .foregroundColor(textColor)
                     Spacer()
                     if selectedTime == time {
                         Image(systemName: "checkmark")
@@ -396,7 +431,7 @@ struct PlayerView: View {
                     }
                 }
                 .padding()
-                .background(Color.white.opacity(0.1))
+                .background(colorScheme == .dark ? Color.white.opacity(0.1) : Color.black.opacity(0.05))
                 .cornerRadius(10)
                 .padding(.horizontal)
             }
@@ -407,7 +442,16 @@ struct PlayerView: View {
     struct PlaybackSpeedSheet: View {
         @Binding var isPresented: Bool
         @Binding var currentRate: Double
+        @Environment(\.colorScheme) private var colorScheme
         var onSpeedSet: (Double) -> Void
+        
+        var textColor: Color {
+            colorScheme == .dark ? .white : .black
+        }
+        
+        var secondaryTextColor: Color {
+            colorScheme == .dark ? .white.opacity(0.7) : .black.opacity(0.7)
+        }
         
         private let speedOptions: [Double] = [0.5, 0.75, 1.0, 1.25, 1.5, 1.75, 2.0]
         
@@ -427,12 +471,12 @@ struct PlayerView: View {
                     Text("Playback Speed")
                         .font(.title2)
                         .fontWeight(.bold)
-                        .foregroundColor(.white)
+                        .foregroundColor(textColor)
                         .padding(.top, 20)
                     
                     Text("Select playback speed for your music")
                         .font(.subheadline)
-                        .foregroundColor(.white.opacity(0.7))
+                        .foregroundColor(secondaryTextColor)
                         .multilineTextAlignment(.center)
                         .padding(.horizontal)
                     
@@ -448,7 +492,7 @@ struct PlayerView: View {
                     Button("Cancel") {
                         isPresented = false
                     }
-                    .foregroundColor(.white)
+                    .foregroundColor(textColor)
                     .padding(.bottom, 30)
                 }
             }
@@ -462,7 +506,7 @@ struct PlayerView: View {
             } label: {
                 HStack {
                     Text(String(format: "%.2fx", speed))
-                        .foregroundColor(.white)
+                        .foregroundColor(textColor)
                     Spacer()
                     if currentRate == speed {
                         Image(systemName: "checkmark")
@@ -470,7 +514,7 @@ struct PlayerView: View {
                     }
                 }
                 .padding()
-                .background(Color.white.opacity(0.1))
+                .background(colorScheme == .dark ? Color.white.opacity(0.1) : Color.black.opacity(0.05))
                 .cornerRadius(10)
                 .padding(.horizontal)
             }

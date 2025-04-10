@@ -48,7 +48,6 @@ struct ContentView: View {
                 }
                 .tag(4)
         }
-        .accentColor(.pink)
         .onAppear {
             updateAppearance()
         }
@@ -71,18 +70,26 @@ struct ContentView: View {
         tabBarAppearance.backgroundColor = UIColor(Color("bottomBacground"))
         
         // Настраиваем цвет текста и иконок TabBar
-        let textColor = UIColor.white
-        tabBarAppearance.stackedLayoutAppearance.normal.titleTextAttributes = [.foregroundColor: textColor]
-        tabBarAppearance.stackedLayoutAppearance.selected.titleTextAttributes = [.foregroundColor: textColor]
-        tabBarAppearance.inlineLayoutAppearance.normal.titleTextAttributes = [.foregroundColor: textColor]
-        tabBarAppearance.inlineLayoutAppearance.selected.titleTextAttributes = [.foregroundColor: textColor]
-        tabBarAppearance.compactInlineLayoutAppearance.normal.titleTextAttributes = [.foregroundColor: textColor]
-        tabBarAppearance.compactInlineLayoutAppearance.selected.titleTextAttributes = [.foregroundColor: textColor]
+        let textColor = UIColor.white // Завжди білий для темної теми
+        let accentUIColor = UIColor(Color.pink) // UIColor із нашого accent color
         
-        // Налаштовуємо колір іконок
+        // Налаштування кольорів тексту
+        tabBarAppearance.stackedLayoutAppearance.normal.titleTextAttributes = [.foregroundColor: textColor]
+        tabBarAppearance.stackedLayoutAppearance.selected.titleTextAttributes = [.foregroundColor: accentUIColor]
+        tabBarAppearance.inlineLayoutAppearance.normal.titleTextAttributes = [.foregroundColor: textColor]
+        tabBarAppearance.inlineLayoutAppearance.selected.titleTextAttributes = [.foregroundColor: accentUIColor]
+        tabBarAppearance.compactInlineLayoutAppearance.normal.titleTextAttributes = [.foregroundColor: textColor]
+        tabBarAppearance.compactInlineLayoutAppearance.selected.titleTextAttributes = [.foregroundColor: accentUIColor]
+        
+        // Налаштовуємо колір іконок - завжди білі для темної теми
         tabBarAppearance.stackedLayoutAppearance.normal.iconColor = UIColor.white
         tabBarAppearance.inlineLayoutAppearance.normal.iconColor = UIColor.white
         tabBarAppearance.compactInlineLayoutAppearance.normal.iconColor = UIColor.white
+        
+        // Налаштування кольорів вибраних іконок
+        tabBarAppearance.stackedLayoutAppearance.selected.iconColor = accentUIColor
+        tabBarAppearance.inlineLayoutAppearance.selected.iconColor = accentUIColor
+        tabBarAppearance.compactInlineLayoutAppearance.selected.iconColor = accentUIColor
         
         // Применяем настройки для TabBar
         UITabBar.appearance().standardAppearance = tabBarAppearance
@@ -92,8 +99,17 @@ struct ContentView: View {
         let navigationBarAppearance = UINavigationBarAppearance()
         navigationBarAppearance.configureWithOpaqueBackground()
         navigationBarAppearance.backgroundColor = UIColor(Color("topBacground"))
-        navigationBarAppearance.titleTextAttributes = [.foregroundColor: textColor]
-        navigationBarAppearance.largeTitleTextAttributes = [.foregroundColor: textColor]
+        navigationBarAppearance.titleTextAttributes = [.foregroundColor: isDarkMode ? UIColor.white : UIColor.black]
+        navigationBarAppearance.largeTitleTextAttributes = [.foregroundColor: isDarkMode ? UIColor.white : UIColor.black]
+        
+        // Налаштовуємо кольори кнопок та елементів навігаційного бару
+        let barButtonItemAppearance = UIBarButtonItemAppearance(style: .plain)
+        barButtonItemAppearance.normal.titleTextAttributes = [.foregroundColor: isDarkMode ? UIColor.white : UIColor.black]
+        navigationBarAppearance.buttonAppearance = barButtonItemAppearance
+        navigationBarAppearance.backButtonAppearance = barButtonItemAppearance
+        
+        // Застосовуємо колір до кнопок навігації
+        UINavigationBar.appearance().tintColor = isDarkMode ? UIColor.white : UIColor.black
         
         // Применяем настройки для NavigationBar
         UINavigationBar.appearance().standardAppearance = navigationBarAppearance
