@@ -48,7 +48,7 @@ struct ContentView: View {
                 }
                 .tag(4)
         }
-        .accentColor(currentColorScheme == .dark ? .white : .blue)
+        .accentColor(.pink)
         .onAppear {
             updateAppearance()
         }
@@ -71,13 +71,18 @@ struct ContentView: View {
         tabBarAppearance.backgroundColor = UIColor(Color("bottomBacground"))
         
         // Настраиваем цвет текста и иконок TabBar
-        let textColor = isDarkMode ? UIColor.white : UIColor.darkGray
+        let textColor = UIColor.white
         tabBarAppearance.stackedLayoutAppearance.normal.titleTextAttributes = [.foregroundColor: textColor]
         tabBarAppearance.stackedLayoutAppearance.selected.titleTextAttributes = [.foregroundColor: textColor]
         tabBarAppearance.inlineLayoutAppearance.normal.titleTextAttributes = [.foregroundColor: textColor]
         tabBarAppearance.inlineLayoutAppearance.selected.titleTextAttributes = [.foregroundColor: textColor]
         tabBarAppearance.compactInlineLayoutAppearance.normal.titleTextAttributes = [.foregroundColor: textColor]
         tabBarAppearance.compactInlineLayoutAppearance.selected.titleTextAttributes = [.foregroundColor: textColor]
+        
+        // Налаштовуємо колір іконок
+        tabBarAppearance.stackedLayoutAppearance.normal.iconColor = UIColor.white
+        tabBarAppearance.inlineLayoutAppearance.normal.iconColor = UIColor.white
+        tabBarAppearance.compactInlineLayoutAppearance.normal.iconColor = UIColor.white
         
         // Применяем настройки для TabBar
         UITabBar.appearance().standardAppearance = tabBarAppearance

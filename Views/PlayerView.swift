@@ -12,10 +12,12 @@ struct PlayerView: View {
     @Environment(\.managedObjectContext) private var viewContext
     @StateObject private var audioManager = AudioManager.shared
     @StateObject private var playlistManager = PlaylistManager.shared
+    @EnvironmentObject private var themeManager: ThemeManager
     @State private var showingSleepPicker = false
     @State private var selectedSleepTime: TimeInterval = 0
     @State private var showingSpeedPicker = false
     @State private var currentPlaybackRate: Double = 1.0
+    @State private var dominantColor: Color? = nil
     
     private let sleepOptions: [TimeInterval] = [
         0,      // Выключено
@@ -32,16 +34,31 @@ struct PlayerView: View {
     var body: some View {
         NavigationView {
             ZStack {
-                // Background gradient
-                LinearGradient(
-                    gradient: Gradient(colors: [
-                        Color("topBacground"),
-                        Color("bottomBacground")
-                    ]),
-                    startPoint: .top,
-                    endPoint: .bottom
-                )
-                .ignoresSafeArea()
+                // Фон в залежності від налаштувань
+                if themeManager.playerBackgroundMode == .staticGradient || dominantColor == nil {
+                    // Стандартний градієнтний фон
+                    LinearGradient(
+                        gradient: Gradient(colors: [
+                            Color("topBacground"),
+                            Color("bottomBacground")
+                        ]),
+                        startPoint: .top,
+                        endPoint: .bottom
+                    )
+                    .ignoresSafeArea()
+                } else {
+                    // Динамічний фон на основі обкладинки
+                    LinearGradient(
+                        gradient: Gradient(colors: [
+                            dominantColor!.opacity(0.8),
+                            dominantColor!.opacity(0.4),
+                            Color.black.opacity(0.9)
+                        ]),
+                        startPoint: .top,
+                        endPoint: .bottom
+                    )
+                    .ignoresSafeArea()
+                }
                 
                 VStack(spacing: 20) {
                     Spacer()
@@ -57,6 +74,12 @@ struct PlayerView: View {
                             .cornerRadius(12)
                             .scaleEffect(audioManager.isPlaying ? 1.2 : 1.0)
                             .animation(.spring(response: 0.3, dampingFraction: 0.6), value: audioManager.isPlaying)
+                            .onAppear {
+                                if themeManager.playerBackgroundMode == .dynamic {
+                                    // Отримуємо домінуючий колір з обкладинки
+                                    dominantColor = extractDominantColor(from: uiImage)
+                                }
+                            }
                     } else {
                         Image(systemName: "music.note")
                             .resizable()
@@ -230,6 +253,26 @@ struct PlayerView: View {
                 )
                 .presentationDetents([.medium])
                 .presentationBackground(Material.ultraThin)
+            }
+            .onChange(of: themeManager.playerBackgroundMode) { newValue in
+                if newValue == .staticGradient {
+                    // Скидаємо домінуючий колір при зміні на статичний режим
+                    dominantColor = nil
+                } else if let coverData = audioManager.currentSong?.coverImageData,
+                          let uiImage = UIImage(data: coverData) {
+                    // Оновлюємо домінуючий колір при зміні на динамічний режим
+                    dominantColor = extractDominantColor(from: uiImage)
+                }
+            }
+            .onReceive(audioManager.$currentSong) { newSong in
+                if themeManager.playerBackgroundMode == .dynamic, 
+                   let coverData = newSong?.coverImageData,
+                   let uiImage = UIImage(data: coverData) {
+                    // Оновлюємо домінуючий колір при зміні пісні
+                    dominantColor = extractDominantColor(from: uiImage)
+                } else if themeManager.playerBackgroundMode == .staticGradient {
+                    dominantColor = nil
+                }
             }
         }
     }
@@ -432,5 +475,39 @@ struct PlayerView: View {
                 .padding(.horizontal)
             }
         }
+    }
+    
+    // Функція для отримання домінуючого кольору з обкладинки
+    private func extractDominantColor(from image: UIImage) -> Color {
+        guard let inputImage = CIImage(image: image) else { return Color("topBacground") }
+        
+        let extentVector = CIVector(x: inputImage.extent.origin.x,
+                                    y: inputImage.extent.origin.y,
+                                    z: inputImage.extent.size.width,
+                                    w: inputImage.extent.size.height)
+        
+        guard let filter = CIFilter(name: "CIAreaAverage",
+                                  parameters: [kCIInputImageKey: inputImage, kCIInputExtentKey: extentVector]) else {
+            return Color("topBacground")
+        }
+        
+        guard let outputImage = filter.outputImage else {
+            return Color("topBacground")
+        }
+        
+        var bitmap = [UInt8](repeating: 0, count: 4)
+        let context = CIContext(options: [.workingColorSpace: kCFNull as Any])
+        
+        context.render(outputImage,
+                      toBitmap: &bitmap,
+                      rowBytes: 4,
+                      bounds: CGRect(x: 0, y: 0, width: 1, height: 1),
+                      format: .RGBA8,
+                      colorSpace: nil)
+        
+        // Створюємо колір з отриманих значень RGB
+        return Color(red: Double(bitmap[0]) / 255.0,
+                    green: Double(bitmap[1]) / 255.0,
+                    blue: Double(bitmap[2]) / 255.0)
     }
 } 
