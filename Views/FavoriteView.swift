@@ -17,20 +17,37 @@ struct FavoriteView: View {
         animation: .default)
     private var songs: FetchedResults<Song>
     @Binding var selectedTab: Int
+    @Environment(\.colorScheme) private var colorScheme
     
     var body: some View {
         NavigationView {
             ZStack {
                 // Background gradient
-                LinearGradient(
-                    gradient: Gradient(colors: [
-                        Color("topBacground"),
-                        Color("bottomBacground")
-                    ]),
-                    startPoint: .top,
-                    endPoint: .bottom
-                )
-                .ignoresSafeArea()
+                Group {
+                    if colorScheme == .dark {
+                        // Для темної теми використовуємо однаковий колір з різною прозорістю
+                        LinearGradient(
+                            gradient: Gradient(colors: [
+                                Color("bottomBacground").opacity(0.95),
+                                Color("bottomBacground")
+                            ]),
+                            startPoint: .top,
+                            endPoint: .bottom
+                        )
+                        .ignoresSafeArea()
+                    } else {
+                        // Для світлої теми залишаємо як є
+                        LinearGradient(
+                            gradient: Gradient(colors: [
+                                Color("topBacground"),
+                                Color("bottomBacground")
+                            ]),
+                            startPoint: .top,
+                            endPoint: .bottom
+                        )
+                        .ignoresSafeArea()
+                    }
+                }
                 
                 // Content
                 if songs.isEmpty {
