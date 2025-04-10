@@ -13,11 +13,17 @@ import AVFoundation
 struct PlaylistDetailView: View {
     @ObservedObject var playlist: Playlist
     @Environment(\.managedObjectContext) private var viewContext
+    @Environment(\.colorScheme) private var colorScheme
     @State private var showFileImporter = false
     @State private var importError: Error?
     @State private var showAlert = false
     @State private var songs: [Song] = []
     @Binding var selectedTab: Int
+    
+    // Колір для іконки плюса
+    var plusIconColor: Color {
+        colorScheme == .dark ? .white : .black
+    }
     
     init(playlist: Playlist, selectedTab: Binding<Int>) {
         self.playlist = playlist
@@ -92,8 +98,8 @@ struct PlaylistDetailView: View {
                 SongRow(song: song)
                     .listRowBackground(Color.clear)
                     .contentShape(Rectangle())
-                    .listRowInsets(EdgeInsets(top: 8, leading: 16, bottom: 8, trailing: 16))
-                    .frame(height: 60)
+                    .listRowInsets(EdgeInsets(top: 4, leading: 0, bottom: 4, trailing: 0))
+                    .frame(height: 66)
                     .onTapGesture {
                         print("Tapped song: \(song.title ?? "Unknown")")
                         PlaylistManager.shared.setPlaylist(songs)
@@ -127,7 +133,7 @@ struct PlaylistDetailView: View {
             showFileImporter = true
         } label: {
             Image(systemName: "plus")
-                .foregroundColor(.white)
+                .foregroundColor(plusIconColor)
         }
         .buttonStyle(.plain)
     }

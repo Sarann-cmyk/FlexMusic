@@ -65,6 +65,11 @@ struct LibraryView: View {
         colorScheme == .dark ? .white.opacity(0.7) : .black.opacity(0.7)
     }
     
+    // Колір для іконки плюс
+    var plusIconColor: Color {
+        colorScheme == .dark ? .white : .black.opacity(0.7)
+    }
+    
     private func randomColor() -> Color {
         let colors: [Color] = [
             .blue, .purple, .pink, .red, .orange, 
@@ -249,7 +254,7 @@ struct LibraryView: View {
                     VStack {
                         Image(systemName: "plus.circle.fill")
                             .font(.system(size: 36))
-                            .foregroundColor(colorScheme == .dark ? .white : .black.opacity(0.7))
+                            .foregroundColor(plusIconColor)
                             .shadow(color: .black.opacity(0.3), radius: 2, x: 0, y: 1)
                         
                         Text("Create Playlist")

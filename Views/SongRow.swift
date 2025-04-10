@@ -10,6 +10,7 @@ import SwiftUI
 
 struct SongRow: View {
     @ObservedObject var song: Song
+    @Environment(\.colorScheme) private var colorScheme
     
     var body: some View {
         HStack(spacing: 12) {
@@ -40,6 +41,14 @@ struct SongRow: View {
             
             Spacer()
             
+            // Favorite indicator
+            if song.isFavorite {
+                Image(systemName: "heart.fill")
+                    .foregroundColor(.pink)
+                    .font(.system(size: 14))
+                    .padding(.trailing, 4)
+            }
+            
             // Duration
             if song.duration > 0 {
                 Text(formatDuration(song.duration))
@@ -47,10 +56,9 @@ struct SongRow: View {
                     .foregroundColor(Color("textSecondary"))
             }
         }
-        .padding(.vertical, 6)
-        .padding(.horizontal, 4)
-        .background(Color.white.opacity(0.05))
-        .cornerRadius(12)
+        .padding(.vertical, 8)
+        .padding(.horizontal, 12)
+        .background(colorScheme == .dark ? Color.black.opacity(0.3) : Color.white.opacity(0.05))
     }
     
     private func formatDuration(_ duration: Double) -> String {
