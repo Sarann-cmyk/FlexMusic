@@ -32,7 +32,7 @@ struct ThemeColors {
     
     // Світла тема
     static let light = ThemeColors(
-        textPrimary: Color.black,
+        textPrimary: Color.black.opacity(0.8),
         textSecondary: Color("textSecondary"),
         background: Color.white,
         topBackground: Color("topBacground"),
@@ -40,16 +40,16 @@ struct ThemeColors {
         
         // TabBar
         tabBarBackground: UIColor(Color("bottomBacground")),
-        tabBarIconsNormal: UIColor.black,
+        tabBarIconsNormal: UIColor.black.withAlphaComponent(0.65),
         tabBarIconsSelected: UIColor(Color.pink),
-        tabBarTextNormal: UIColor.black,
+        tabBarTextNormal: UIColor.black.withAlphaComponent(0.65),
         tabBarTextSelected: UIColor(Color.pink),
         
         // NavigationBar
         navigationBarBackground: UIColor(Color("topBacground")),
-        navigationBarText: UIColor.black,
-        navigationBarButtonText: UIColor.black,
-        navigationBarTint: UIColor.black
+        navigationBarText: UIColor.black.withAlphaComponent(0.8),
+        navigationBarButtonText: UIColor.black.withAlphaComponent(0.8),
+        navigationBarTint: UIColor.black.withAlphaComponent(0.8)
     )
     
     // Темна тема
@@ -68,7 +68,7 @@ struct ThemeColors {
         tabBarTextSelected: UIColor(Color.pink),
         
         // NavigationBar
-        navigationBarBackground: UIColor(Color("topBacground")),
+        navigationBarBackground: UIColor(Color("bottomBacground")),
         navigationBarText: UIColor.white,
         navigationBarButtonText: UIColor.white,
         navigationBarTint: UIColor.white

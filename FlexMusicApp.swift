@@ -79,48 +79,78 @@ class ThemeManager: ObservableObject {
     @Published var colorScheme: ColorScheme?
     
     init() {
-        // Виконаємо updateTheme після короткої затримки, щоб переконатися, що UI вже ініціалізований
         print("ThemeManager: Initializing...")
-        updateTheme()
         
-        // Додаткове оновлення через 1 секунду для стабільності
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
-            // Повний скид налаштувань перед повторним застосуванням
-            UIKitReset.resetAllAppearances()
-            self.updateTheme()
-            print("ThemeManager: Delayed theme update applied after reset")
+        // Спочатку скидаємо налаштування
+        TabBarAppearance.reset()
+        NavigationBarStyler.resetNavigationBarAppearance()
+        
+        // Визначаємо, чи темна тема активна
+        let isDarkMode = UITraitCollection.current.userInterfaceStyle == .dark || themeMode == .dark
+        
+        // Застосовуємо відповідний стиль для навігаційного бару
+        if isDarkMode {
+            NavigationBarStyler.applyDarkTheme()
+            print("ThemeManager: Applied dark navigation bar at startup")
+        } else {
+            NavigationBarStyler.applyLightTheme()
+            print("ThemeManager: Applied light navigation bar at startup")
         }
+        
+        // Оновлюємо тему після застосування стилів
+        updateTheme()
     }
     
     func updateTheme() {
-        // Скидаємо всі попередні налаштування для чистого старту
-        TabBarAppearance.reset()
-        
         // Визначаємо чи темна тема активна
-        let isDarkModeActive: Bool
-        
         switch themeMode {
         case .light:
             colorScheme = .light
-            isDarkModeActive = false
-            print("ThemeManager: Light theme activated")
+            print("ThemeManager: Light theme selected")
+            
+            // Застосовуємо налаштування для світлої теми
             TabBarAppearance.configureForLightMode()
+            NavigationBarStyler.applyLightTheme()
+            
         case .dark:
             colorScheme = .dark
-            isDarkModeActive = true
-            print("ThemeManager: Dark theme activated")
+            print("ThemeManager: Dark theme selected")
+            
+            // Застосовуємо налаштування для темної теми
             TabBarAppearance.configureForDarkMode()
+            NavigationBarStyler.applyDarkTheme()
+            
         case .system:
             colorScheme = nil // використовувати системні налаштування
             let systemIsDark = UITraitCollection.current.userInterfaceStyle == .dark
-            isDarkModeActive = systemIsDark
-            print("ThemeManager: System theme activated (isDark: \(systemIsDark))")
+            print("ThemeManager: System theme selected (isDark: \(systemIsDark))")
             
+            // Застосовуємо налаштування в залежності від системної теми
             if systemIsDark {
                 TabBarAppearance.configureForDarkMode()
+                NavigationBarStyler.applyDarkTheme()
             } else {
                 TabBarAppearance.configureForLightMode()
+                NavigationBarStyler.applyLightTheme()
             }
+        }
+        
+        // Оновлюємо всі навігаційні елементи
+        UIApplication.shared.windows.forEach { window in
+            window.rootViewController?.setNeedsStatusBarAppearanceUpdate()
+        }
+        
+        // Примусово оновлюємо всі навігаційні бари з невеликою затримкою
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+            NavigationBarStyler.forceRefreshAllNavigationBars()
+            
+            // Додатково запускаємо UIThemeManager для більш надійного застосування налаштувань
+            let isDarkMode = self.themeMode == .dark || 
+                (self.themeMode == .system && UITraitCollection.current.userInterfaceStyle == .dark)
+            
+            UIThemeManager.shared.applyTheme(isDarkMode: isDarkMode)
+            
+            print("ThemeManager: Theme update completed with additional refresh")
         }
     }
 }
@@ -134,17 +164,41 @@ struct FlexMusicApp: App {
     @UIApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
     
     var body: some Scene {
-        WindowGroup {
+        return WindowGroup {
             ContentView()
                 .environment(\.managedObjectContext, persistenceController.container.viewContext)
                 .preferredColorScheme(themeManager.colorScheme)
                 .environmentObject(themeManager)
                 .onAppear {
-                    // Додаткове оновлення теми при запуску додатку
-                    print("FlexMusicApp: App appeared, updating theme...")
-                    // Скидаємо налаштування перед застосуванням
-                    UIKitReset.resetAllAppearances()
+                    // Використовуємо спрощений підхід 
+                    print("FlexMusicApp: App appeared")
+                    
+                    // Оновлюємо тему (яка вже містить всі потрібні скидання і оновлення)
                     themeManager.updateTheme()
+                }
+                .onChange(of: UIApplication.shared.applicationState) { oldState, newState in
+                    print("FlexMusicApp: App state changed from \(oldState) to \(newState)")
+                    
+                    if newState == .active {
+                        // Додатково примусово оновлюємо тему при виході з фону
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                            // Визначаємо поточну тему
+                            let isDarkMode = themeManager.themeMode == .dark || 
+                                (themeManager.themeMode == .system && UITraitCollection.current.userInterfaceStyle == .dark)
+                            
+                            print("FlexMusicApp: Reapplying theme on active, isDarkMode=\(isDarkMode)")
+                            
+                            // Застосовуємо відповідну тему
+                            if isDarkMode {
+                                NavigationBarStyler.applyDarkTheme()
+                            } else {
+                                NavigationBarStyler.applyLightTheme()
+                            }
+                            
+                            // Примусово оновлюємо навігаційні бари
+                            NavigationBarStyler.forceRefreshAllNavigationBars()
+                        }
+                    }
                 }
         }
     }

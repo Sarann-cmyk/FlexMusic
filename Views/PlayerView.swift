@@ -7,6 +7,7 @@
 
 import SwiftUI
 import CoreData
+import AVFoundation
 
 struct PlayerView: View {
     @Environment(\.managedObjectContext) private var viewContext
@@ -37,7 +38,7 @@ struct PlayerView: View {
         if themeManager.playerBackgroundMode == .dynamic && dominantColor != nil {
             return .white
         } else {
-            return colorScheme == .dark ? .white : .black
+            return colorScheme == .dark ? .white : .black.opacity(0.75)
         }
     }
     
@@ -45,7 +46,7 @@ struct PlayerView: View {
         if themeManager.playerBackgroundMode == .dynamic && dominantColor != nil {
             return .white.opacity(0.7)
         } else {
-            return colorScheme == .dark ? .white.opacity(0.7) : .black.opacity(0.7)
+            return colorScheme == .dark ? .white.opacity(0.7) : .black.opacity(0.6)
         }
     }
     
@@ -53,7 +54,7 @@ struct PlayerView: View {
         if themeManager.playerBackgroundMode == .dynamic && dominantColor != nil {
             return .white
         } else {
-            return colorScheme == .dark ? .white : .black
+            return colorScheme == .dark ? .white : .black.opacity(0.65)
         }
     }
     
@@ -63,15 +64,31 @@ struct PlayerView: View {
                 // Фон в залежності від налаштувань
                 if themeManager.playerBackgroundMode == .staticGradient || dominantColor == nil {
                     // Стандартний градієнтний фон
-                    LinearGradient(
-                        gradient: Gradient(colors: [
-                            Color("topBacground"),
-                            Color("bottomBacground")
-                        ]),
-                        startPoint: .top,
-                        endPoint: .bottom
-                    )
-                    .ignoresSafeArea()
+                    Group {
+                        if colorScheme == .dark {
+                            // Для темної теми використовуємо однаковий колір з різною прозорістю
+                            LinearGradient(
+                                gradient: Gradient(colors: [
+                                    Color("bottomBacground").opacity(0.95),
+                                    Color("bottomBacground")
+                                ]),
+                                startPoint: .top,
+                                endPoint: .bottom
+                            )
+                            .ignoresSafeArea()
+                        } else {
+                            // Для світлої теми залишаємо як є
+                            LinearGradient(
+                                gradient: Gradient(colors: [
+                                    Color("topBacground"),
+                                    Color("bottomBacground")
+                                ]),
+                                startPoint: .top,
+                                endPoint: .bottom
+                            )
+                            .ignoresSafeArea()
+                        }
+                    }
                 } else {
                     // Динамічний фон на основі обкладинки
                     LinearGradient(
@@ -172,30 +189,35 @@ struct PlayerView: View {
                                     .font(.title2)
                                     .foregroundColor(controlsColor)
                             }
+                            .buttonStyle(DefaultButtonStyle())
 
                             Button(action: { audioManager.playPreviousTrack() }) {
                                 Image(systemName: "backward.fill")
                                     .font(.title)
                                     .foregroundColor(controlsColor)
                             }
+                            .buttonStyle(DefaultButtonStyle())
 
                             Button(action: { audioManager.togglePlayPause() }) {
                                 Image(systemName: audioManager.isPlaying ? "pause.circle.fill" : "play.circle.fill")
                                     .font(.system(size: 55))
                                     .foregroundColor(controlsColor)
                             }   
+                            .buttonStyle(DefaultButtonStyle())
                             
                             Button(action: { audioManager.playNextTrack() }) {
                                 Image(systemName: "forward.fill")
                                     .font(.title)
                                     .foregroundColor(controlsColor)
                             }
+                            .buttonStyle(DefaultButtonStyle())
                             
                             Button(action: { audioManager.skipForward() }) {
                                 Image(systemName: "goforward.10")
                                     .font(.title2)
                                     .foregroundColor(controlsColor)
                             }
+                            .buttonStyle(DefaultButtonStyle())
                         }
                         
                         Spacer()
@@ -221,6 +243,7 @@ struct PlayerView: View {
                                 .frame(width: 60, height: 45)
                                 .contentShape(Rectangle())
                             }
+                            .buttonStyle(DefaultButtonStyle())
                             
                             // Favorite Button
                             Button(action: toggleFavorite) {
@@ -234,6 +257,7 @@ struct PlayerView: View {
                                 .frame(width: 60, height: 45)
                                 .contentShape(Rectangle())
                             }
+                            .buttonStyle(DefaultButtonStyle())
                             
                             // Playback Speed Button
                             Button(action: { showingSpeedPicker = true }) {
@@ -253,6 +277,7 @@ struct PlayerView: View {
                                 .frame(width: 60, height: 45)
                                 .contentShape(Rectangle())
                             }
+                            .buttonStyle(DefaultButtonStyle())
                         }
                         .frame(maxWidth: .infinity, alignment: .center)  // Центрируем весь HStack
                     }
@@ -360,25 +385,41 @@ struct PlayerView: View {
         var onTimerSet: (TimeInterval) -> Void
         
         var textColor: Color {
-            colorScheme == .dark ? .white : .black
+            colorScheme == .dark ? .white : .black.opacity(0.75)
         }
         
         var secondaryTextColor: Color {
-            colorScheme == .dark ? .white.opacity(0.7) : .black.opacity(0.7)
+            colorScheme == .dark ? .white.opacity(0.7) : .black.opacity(0.6)
         }
         
         var body: some View {
             ZStack {
                 // Використовуємо тот же градієнт, що і в основному view
-                LinearGradient(
-                    gradient: Gradient(colors: [
-                        Color("topBacground"),
-                        Color("bottomBacground")
-                    ]),
-                    startPoint: .top,
-                    endPoint: .bottom
-                )
-                .ignoresSafeArea()
+                Group {
+                    if colorScheme == .dark {
+                        // Для темної теми використовуємо однаковий колір з різною прозорістю
+                        LinearGradient(
+                            gradient: Gradient(colors: [
+                                Color("bottomBacground").opacity(0.95),
+                                Color("bottomBacground")
+                            ]),
+                            startPoint: .top,
+                            endPoint: .bottom
+                        )
+                        .ignoresSafeArea()
+                    } else {
+                        // Для світлої теми залишаємо як є
+                        LinearGradient(
+                            gradient: Gradient(colors: [
+                                Color("topBacground"),
+                                Color("bottomBacground")
+                            ]),
+                            startPoint: .top,
+                            endPoint: .bottom
+                        )
+                        .ignoresSafeArea()
+                    }
+                }
                 
                 VStack(spacing: 20) {
                     Text("Sleep Timer")
@@ -431,7 +472,7 @@ struct PlayerView: View {
                     }
                 }
                 .padding()
-                .background(colorScheme == .dark ? Color.white.opacity(0.1) : Color.black.opacity(0.05))
+                .background(colorScheme == .dark ? Color.white.opacity(0.1) : Color.black.opacity(0.03))
                 .cornerRadius(10)
                 .padding(.horizontal)
             }
@@ -446,26 +487,42 @@ struct PlayerView: View {
         var onSpeedSet: (Double) -> Void
         
         var textColor: Color {
-            colorScheme == .dark ? .white : .black
+            colorScheme == .dark ? .white : .black.opacity(0.75)
         }
         
         var secondaryTextColor: Color {
-            colorScheme == .dark ? .white.opacity(0.7) : .black.opacity(0.7)
+            colorScheme == .dark ? .white.opacity(0.7) : .black.opacity(0.6)
         }
         
         private let speedOptions: [Double] = [0.5, 0.75, 1.0, 1.25, 1.5, 1.75, 2.0]
         
         var body: some View {
             ZStack {
-                LinearGradient(
-                    gradient: Gradient(colors: [
-                        Color("topBacground"),
-                        Color("bottomBacground")
-                    ]),
-                    startPoint: .top,
-                    endPoint: .bottom
-                )
-                .ignoresSafeArea()
+                Group {
+                    if colorScheme == .dark {
+                        // Для темної теми використовуємо однаковий колір з різною прозорістю
+                        LinearGradient(
+                            gradient: Gradient(colors: [
+                                Color("bottomBacground").opacity(0.95),
+                                Color("bottomBacground")
+                            ]),
+                            startPoint: .top,
+                            endPoint: .bottom
+                        )
+                        .ignoresSafeArea()
+                    } else {
+                        // Для світлої теми залишаємо як є
+                        LinearGradient(
+                            gradient: Gradient(colors: [
+                                Color("topBacground"),
+                                Color("bottomBacground")
+                            ]),
+                            startPoint: .top,
+                            endPoint: .bottom
+                        )
+                        .ignoresSafeArea()
+                    }
+                }
                 
                 VStack(spacing: 20) {
                     Text("Playback Speed")
@@ -514,7 +571,7 @@ struct PlayerView: View {
                     }
                 }
                 .padding()
-                .background(colorScheme == .dark ? Color.white.opacity(0.1) : Color.black.opacity(0.05))
+                .background(colorScheme == .dark ? Color.white.opacity(0.1) : Color.black.opacity(0.03))
                 .cornerRadius(10)
                 .padding(.horizontal)
             }

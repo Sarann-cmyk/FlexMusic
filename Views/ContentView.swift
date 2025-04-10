@@ -56,9 +56,13 @@ struct ContentView: View {
             // Застосовуємо налаштування TabBar залежно від поточної теми
             if currentColorScheme == .dark {
                 TabBarAppearance.configureForDarkMode()
+                // Застосовуємо спеціальні налаштування для навігаційного бару
+                NavigationBarStyler.applyDarkTheme()
                 print("ContentView: Applied DARK theme with WHITE icons")
             } else {
                 TabBarAppearance.configureForLightMode()
+                // Застосовуємо спеціальні налаштування для навігаційного бару
+                NavigationBarStyler.applyLightTheme()
                 print("ContentView: Applied LIGHT theme with BLACK icons")
             }
         }
@@ -66,12 +70,16 @@ struct ContentView: View {
             // Спочатку скидаємо попередні налаштування
             UIKitReset.resetAllAppearances()
             
-            // Потім застосовуємо нові налаштування
+            // Потім застосовуємо нові налаштування для TabBar
             if newColorScheme == .dark {
                 TabBarAppearance.configureForDarkMode()
+                // Застосовуємо спеціальні налаштування для навігаційного бару
+                NavigationBarStyler.applyDarkTheme()
                 print("ContentView: Changed to DARK theme with WHITE icons")
             } else {
                 TabBarAppearance.configureForLightMode()
+                // Застосовуємо спеціальні налаштування для навігаційного бару
+                NavigationBarStyler.applyLightTheme() 
                 print("ContentView: Changed to LIGHT theme with BLACK icons")
             }
         }

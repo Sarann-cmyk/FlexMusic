@@ -21,7 +21,12 @@ class UIThemeManager {
         configureTabBar(with: colors, isDarkMode: isDarkMode)
         
         // Налаштування для NavigationBar
-        configureNavigationBar(with: colors)
+        configureNavigationBar(with: colors, isDarkMode: isDarkMode)
+        
+        // Додаткове примусове налаштування для NavigationBar в темній темі
+        if isDarkMode {
+            forceBlackNavigationBar()
+        }
         
         print("UIThemeManager: Applied theme, isDarkMode=\(isDarkMode)")
     }
@@ -29,52 +34,84 @@ class UIThemeManager {
     // Налаштування TabBar
     private func configureTabBar(with colors: ThemeColors, isDarkMode: Bool) {
         let tabBarAppearance = UITabBarAppearance()
-        tabBarAppearance.configureWithOpaqueBackground()
-        tabBarAppearance.backgroundColor = colors.tabBarBackground
         
-        // Чітко встановлюємо саме ті кольори які потрібні для кожної теми
-        let iconColor = isDarkMode ? UIColor.white : UIColor.black
-        let textColor = isDarkMode ? UIColor.white : UIColor.black
-        let accentColor = UIColor(Color.pink)
+        if isDarkMode {
+            // Непрозорий чорний фон з сірою верхньою межею
+            tabBarAppearance.configureWithOpaqueBackground()
+            tabBarAppearance.backgroundColor = .black
+            tabBarAppearance.shadowColor = UIColor.darkGray.withAlphaComponent(0.3)
+            tabBarAppearance.shadowImage = createSinglePixelImage(color: UIColor.darkGray.withAlphaComponent(0.3))
+            
+            // Додатково встановлюємо BorderWidth для більш чіткого вигляду на iOS 17+
+            if #available(iOS 17.0, *) {
+                UITabBar.appearance().layer.borderWidth = 0.5
+                UITabBar.appearance().layer.borderColor = UIColor.darkGray.withAlphaComponent(0.3).cgColor
+                UITabBar.appearance().barTintColor = .black
+            }
+        } else {
+            // Світла тема - білий фон
+            tabBarAppearance.configureWithOpaqueBackground()
+            tabBarAppearance.backgroundColor = colors.tabBarBackground
+        }
         
-        // Налаштування кольорів тексту
-        tabBarAppearance.stackedLayoutAppearance.normal.titleTextAttributes = [.foregroundColor: textColor]
-        tabBarAppearance.stackedLayoutAppearance.selected.titleTextAttributes = [.foregroundColor: accentColor]
-        tabBarAppearance.inlineLayoutAppearance.normal.titleTextAttributes = [.foregroundColor: textColor]
-        tabBarAppearance.inlineLayoutAppearance.selected.titleTextAttributes = [.foregroundColor: accentColor]
-        tabBarAppearance.compactInlineLayoutAppearance.normal.titleTextAttributes = [.foregroundColor: textColor]
-        tabBarAppearance.compactInlineLayoutAppearance.selected.titleTextAttributes = [.foregroundColor: accentColor]
+        // Налаштування для різних станів табів
+        let itemAppearance = UITabBarItemAppearance()
         
-        // Налаштування кольорів іконок - примусово встановлюємо їх напряму
-        tabBarAppearance.stackedLayoutAppearance.normal.iconColor = iconColor
-        tabBarAppearance.inlineLayoutAppearance.normal.iconColor = iconColor
-        tabBarAppearance.compactInlineLayoutAppearance.normal.iconColor = iconColor
+        // Нормальний стан
+        itemAppearance.normal.iconColor = isDarkMode ? .white : UIColor.black.withAlphaComponent(0.65)
+        itemAppearance.normal.titleTextAttributes = [.foregroundColor: isDarkMode ? UIColor.white : UIColor.black.withAlphaComponent(0.65)]
         
-        // Налаштування кольорів вибраних іконок
-        tabBarAppearance.stackedLayoutAppearance.selected.iconColor = accentColor
-        tabBarAppearance.inlineLayoutAppearance.selected.iconColor = accentColor
-        tabBarAppearance.compactInlineLayoutAppearance.selected.iconColor = accentColor
+        // Вибраний стан
+        itemAppearance.selected.iconColor = colors.tabBarIconsSelected
+        itemAppearance.selected.titleTextAttributes = [.foregroundColor: colors.tabBarTextSelected]
         
-        // Застосування налаштувань
+        // Застосовуємо налаштування до всіх типів макетів
+        tabBarAppearance.stackedLayoutAppearance = itemAppearance
+        tabBarAppearance.inlineLayoutAppearance = itemAppearance
+        tabBarAppearance.compactInlineLayoutAppearance = itemAppearance
+        
+        // Застосовуємо налаштування до UITabBar
         UITabBar.appearance().standardAppearance = tabBarAppearance
         UITabBar.appearance().scrollEdgeAppearance = tabBarAppearance
         
-        // Примусово встановлюємо додаткові налаштування для підтримки різних версій iOS
-        UITabBar.appearance().tintColor = accentColor
-        UITabBar.appearance().unselectedItemTintColor = iconColor
-        
-        if isDarkMode {
-            print("UIThemeManager: TabBar icons set to WHITE for dark mode")
-        } else {
-            print("UIThemeManager: TabBar icons set to BLACK for light mode")
+        // Встановлюємо кольори для елементів напряму
+        UITabBar.appearance().unselectedItemTintColor = isDarkMode ? .white : UIColor.black.withAlphaComponent(0.65)
+        UITabBar.appearance().tintColor = colors.tabBarIconsSelected
+    }
+    
+    // Допоміжна функція для створення одиночного пікселя
+    private func createSinglePixelImage(color: UIColor) -> UIImage {
+        let size = CGSize(width: 1, height: 1)
+        let renderer = UIGraphicsImageRenderer(size: size)
+        return renderer.image { context in
+            color.setFill()
+            context.fill(CGRect(origin: .zero, size: size))
         }
     }
     
     // Налаштування NavigationBar
-    private func configureNavigationBar(with colors: ThemeColors) {
+    private func configureNavigationBar(with colors: ThemeColors, isDarkMode: Bool) {
         let navigationBarAppearance = UINavigationBarAppearance()
-        navigationBarAppearance.configureWithOpaqueBackground()
-        navigationBarAppearance.backgroundColor = colors.navigationBarBackground
+        
+        if isDarkMode {
+            // Для темної теми робимо чистий чорний фон
+            navigationBarAppearance.configureWithOpaqueBackground()
+            
+            // Видаляємо ефект розмиття
+            navigationBarAppearance.backgroundEffect = nil
+            
+            // Використовуємо повністю чорний колір без прозорості
+            navigationBarAppearance.backgroundColor = UIColor.black
+            
+            // Темна тінь для чіткішого розділення
+            navigationBarAppearance.shadowColor = UIColor(red: 0, green: 0, blue: 0, alpha: 0.3)
+            navigationBarAppearance.shadowImage = UIImage()
+        } else {
+            // Непрозорий фон для світлої теми
+            navigationBarAppearance.configureWithOpaqueBackground()
+            navigationBarAppearance.backgroundColor = colors.navigationBarBackground
+        }
+        
         navigationBarAppearance.titleTextAttributes = [.foregroundColor: colors.navigationBarText]
         navigationBarAppearance.largeTitleTextAttributes = [.foregroundColor: colors.navigationBarText]
         
@@ -91,5 +128,21 @@ class UIThemeManager {
         UINavigationBar.appearance().standardAppearance = navigationBarAppearance
         UINavigationBar.appearance().scrollEdgeAppearance = navigationBarAppearance
         UINavigationBar.appearance().compactAppearance = navigationBarAppearance
+        
+        // Додаткові прямі налаштування для прозорості
+        if isDarkMode {
+            // Встановлюємо true для узгодження з NavigationBarStyler
+            UINavigationBar.appearance().isTranslucent = true
+            UINavigationBar.appearance().barTintColor = UIColor.black
+        } else {
+            UINavigationBar.appearance().isTranslucent = true
+            UINavigationBar.appearance().barTintColor = colors.navigationBarBackground
+        }
+    }
+    
+    // Примусове налаштування чорного навігаційного бару
+    private func forceBlackNavigationBar() {
+        // Використовуємо спеціалізований стилізатор для навігаційного бару
+        NavigationBarStyler.applyDarkTheme()
     }
 } 

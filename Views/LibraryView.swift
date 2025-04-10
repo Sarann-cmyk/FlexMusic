@@ -58,16 +58,16 @@ struct LibraryView: View {
     
     // Кольори залежні від теми
     var textColor: Color {
-        colorScheme == .dark ? .white : .black
+        colorScheme == .dark ? .white : .black.opacity(0.75)
     }
     
     var secondaryTextColor: Color {
-        colorScheme == .dark ? .white.opacity(0.7) : .black.opacity(0.7)
+        colorScheme == .dark ? .white.opacity(0.7) : .black.opacity(0.6)
     }
     
     // Колір для іконки плюс
     var plusIconColor: Color {
-        colorScheme == .dark ? .white : .black.opacity(0.7)
+        colorScheme == .dark ? .white : .black.opacity(0.65)
     }
     
     private func randomColor() -> Color {
@@ -246,7 +246,7 @@ struct LibraryView: View {
                 ZStack {
                     // Використовуємо саме 1:1 співвідношення сторін
                     Rectangle()
-                        .fill(Color.gray.opacity(0.3))
+                        .fill(Color.gray.opacity(colorScheme == .dark ? 0.3 : 0.2))
                         .aspectRatio(1, contentMode: .fit)
                         .cornerRadius(12)
                         .shadow(color: .black.opacity(0.2), radius: 4, x: 0, y: 2)
@@ -284,21 +284,38 @@ struct LibraryView: View {
                 .padding(.bottom, 6)
             }
         }
+        .buttonStyle(PlainButtonStyle())
     }
     
     var body: some View {
         NavigationView {
             ZStack {
                 // Фоновый градиент
-                LinearGradient(
-                    gradient: Gradient(colors: [
-                        Color("topBacground"),
-                        Color("bottomBacground")
-                    ]),
-                    startPoint: .top,
-                    endPoint: .bottom
-                )
-                .ignoresSafeArea()
+                Group {
+                    if colorScheme == .dark {
+                        // Для темної теми використовуємо однаковий колір з різною прозорістю
+                        LinearGradient(
+                            gradient: Gradient(colors: [
+                                Color("bottomBacground").opacity(0.95),
+                                Color("bottomBacground")
+                            ]),
+                            startPoint: .top,
+                            endPoint: .bottom
+                        )
+                        .ignoresSafeArea()
+                    } else {
+                        // Для світлої теми залишаємо як є
+                        LinearGradient(
+                            gradient: Gradient(colors: [
+                                Color("topBacground"),
+                                Color("bottomBacground")
+                            ]),
+                            startPoint: .top,
+                            endPoint: .bottom
+                        )
+                        .ignoresSafeArea()
+                    }
+                }
                 
                 ScrollView {
                     VStack(alignment: .leading) {

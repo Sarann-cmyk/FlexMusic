@@ -42,6 +42,16 @@ struct UIKitReset {
             }
         }
         
+        // Відразу застосовуємо стиль для навігаційного бару залежно від теми
+        let isDarkMode = UITraitCollection.current.userInterfaceStyle == .dark
+        DispatchQueue.main.async {
+            if isDarkMode {
+                NavigationBarStyler.applyDarkTheme()
+            } else {
+                NavigationBarStyler.applyLightTheme()
+            }
+        }
+        
         print("UIKitReset: All UIKit appearances have been reset")
     }
 } 

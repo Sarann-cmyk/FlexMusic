@@ -18,8 +18,23 @@ struct TabBarModifier: ViewModifier {
                 
                 // Налаштування для оновлення TabBar
                 let appearance = UITabBarAppearance()
-                appearance.configureWithOpaqueBackground()
-                appearance.backgroundColor = UIColor(backgroundColor)
+                
+                if isDarkMode {
+                    // Мінімальна помітність для темної теми
+                    appearance.configureWithTransparentBackground()
+                    
+                    // Видаляємо ефект розмиття, щоб не було сірого відтінку
+                    appearance.backgroundEffect = nil
+                    
+                    // Використовуємо чистий чорний колір з високою прозорістю
+                    appearance.backgroundColor = UIColor.black.withAlphaComponent(0.2)
+                    
+                    // Додаємо тонку верхню межу для делікатного розділення
+                    appearance.shadowColor = UIColor.black.withAlphaComponent(0.3)
+                } else {
+                    appearance.configureWithOpaqueBackground()
+                    appearance.backgroundColor = UIColor(backgroundColor)
+                }
                 
                 let itemAppearance = UITabBarItemAppearance()
                 

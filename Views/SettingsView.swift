@@ -12,11 +12,11 @@ struct SettingsView: View {
     @Environment(\.colorScheme) private var colorScheme
     
     var textColor: Color {
-        colorScheme == .dark ? .white : .black
+        colorScheme == .dark ? .white : .black.opacity(0.75)
     }
     
     var secondaryTextColor: Color {
-        colorScheme == .dark ? .white.opacity(0.7) : .black.opacity(0.7)
+        colorScheme == .dark ? .white.opacity(0.7) : .black.opacity(0.6)
     }
     
     var overlayStrokeColor: Color {
@@ -36,7 +36,8 @@ struct SettingsView: View {
         iconColor: Color
     ) -> some View {
         Button {
-            themeManager.themeMode = mode
+            // Обробка натискання кнопки в окремому блоці для уникнення проблем з кешуванням
+            handleThemeButtonPress(mode: mode)
         } label: {
             VStack(spacing: 8) {
                 Image(systemName: icon)
@@ -61,19 +62,107 @@ struct SettingsView: View {
         .buttonStyle(PlainButtonStyle())
     }
     
+    // Окрема функція для обробки зміни теми з додатковими очищеннями і затримками
+    private func handleThemeButtonPress(mode: ThemeMode) {
+        // Встановлюємо нову тему (це викличе оновлення через didSet у ThemeManager)
+        themeManager.themeMode = mode
+        
+        // Додаткове примусове застосування з невеликою затримкою
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
+            // Застосовуємо потрібний стиль напряму
+            switch mode {
+            case .light:
+                NavigationBarStyler.applyLightTheme()
+            case .dark:
+                NavigationBarStyler.applyDarkTheme()
+            case .system:
+                let isDarkMode = UITraitCollection.current.userInterfaceStyle == .dark
+                if isDarkMode {
+                    NavigationBarStyler.applyDarkTheme()
+                } else {
+                    NavigationBarStyler.applyLightTheme()
+                }
+            }
+            
+            // Примусово оновлюємо всі навігаційні бари
+            NavigationBarStyler.forceRefreshAllNavigationBars()
+            
+            // Додаткове застосування через UIThemeManager для узгодження всіх елементів
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                // Визначаємо, чи активована темна тема
+                let isDarkMode = mode == .dark || 
+                    (mode == .system && UITraitCollection.current.userInterfaceStyle == .dark)
+                
+                // Застосовуємо відповідні налаштування
+                UIThemeManager.shared.applyTheme(isDarkMode: isDarkMode)
+                
+                // Примусово оновлюємо ще раз
+                NavigationBarStyler.forceRefreshAllNavigationBars()
+                
+                print("SettingsView: Additional theme refresh applied, isDarkMode=\(isDarkMode)")
+            }
+        }
+        
+        print("SettingsView: Theme changed to \(mode)")
+    }
+    
+    // Функція для примусового оновлення навігаційних барів
+    private func forceUpdateAllNavigationBars() {
+        if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+           let window = windowScene.windows.first {
+            recursiveUpdateNavBars(in: window.rootViewController)
+        }
+    }
+    
+    // Рекурсивно оновлює всі NavigationController в ієрархії
+    private func recursiveUpdateNavBars(in viewController: UIViewController?) {
+        guard let viewController = viewController else { return }
+        
+        if let navigationController = viewController as? UINavigationController {
+            // Примусово запускаємо оновлення UI
+            navigationController.navigationBar.layoutIfNeeded()
+        }
+        
+        // Обробляємо презентовані контролери
+        if let presented = viewController.presentedViewController {
+            recursiveUpdateNavBars(in: presented)
+        }
+        
+        // Обробляємо дочірні контролери
+        for child in viewController.children {
+            recursiveUpdateNavBars(in: child)
+        }
+    }
+    
     var body: some View {
         NavigationView {
             ZStack {
                 // Background gradient
-                LinearGradient(
-                    gradient: Gradient(colors: [
-                        Color("topBacground"),
-                        Color("bottomBacground")
-                    ]),
-                    startPoint: .top,
-                    endPoint: .bottom
-                )
-                .ignoresSafeArea()
+                Group {
+                    if colorScheme == .dark {
+                        // Для темної теми використовуємо однаковий колір з різною прозорістю
+                        LinearGradient(
+                            gradient: Gradient(colors: [
+                                Color("bottomBacground").opacity(0.95),
+                                Color("bottomBacground")
+                            ]),
+                            startPoint: .top,
+                            endPoint: .bottom
+                        )
+                        .ignoresSafeArea()
+                    } else {
+                        // Для світлої теми залишаємо як є
+                        LinearGradient(
+                            gradient: Gradient(colors: [
+                                Color("topBacground"),
+                                Color("bottomBacground")
+                            ]),
+                            startPoint: .top,
+                            endPoint: .bottom
+                        )
+                        .ignoresSafeArea()
+                    }
+                }
                 
                 VStack {
                     List {
@@ -122,6 +211,7 @@ struct SettingsView: View {
                                     }
                                 }
                             }
+                            .buttonStyle(PlainButtonStyle())
                             .listRowBackground(Color.clear)
                         }
                         
@@ -154,11 +244,11 @@ struct PlayerBackgroundSettingsView: View {
     @Environment(\.colorScheme) private var colorScheme
     
     var textColor: Color {
-        colorScheme == .dark ? .white : .black
+        colorScheme == .dark ? .white : .black.opacity(0.75)
     }
     
     var secondaryTextColor: Color {
-        colorScheme == .dark ? .white.opacity(0.7) : .black.opacity(0.7)
+        colorScheme == .dark ? .white.opacity(0.7) : .black.opacity(0.6)
     }
     
     var cardBackgroundColor: Color {
@@ -168,15 +258,31 @@ struct PlayerBackgroundSettingsView: View {
     var body: some View {
         ZStack {
             // Background gradient
-            LinearGradient(
-                gradient: Gradient(colors: [
-                    Color("topBacground"),
-                    Color("bottomBacground")
-                ]),
-                startPoint: .top,
-                endPoint: .bottom
-            )
-            .ignoresSafeArea()
+            Group {
+                if colorScheme == .dark {
+                    // Для темної теми використовуємо однаковий колір з різною прозорістю
+                    LinearGradient(
+                        gradient: Gradient(colors: [
+                            Color("bottomBacground").opacity(0.95),
+                            Color("bottomBacground")
+                        ]),
+                        startPoint: .top,
+                        endPoint: .bottom
+                    )
+                    .ignoresSafeArea()
+                } else {
+                    // Для світлої теми залишаємо як є
+                    LinearGradient(
+                        gradient: Gradient(colors: [
+                            Color("topBacground"),
+                            Color("bottomBacground")
+                        ]),
+                        startPoint: .top,
+                        endPoint: .bottom
+                    )
+                    .ignoresSafeArea()
+                }
+            }
             
             VStack(spacing: 20) {
                 // Заголовок та опис
