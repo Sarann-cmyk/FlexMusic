@@ -34,29 +34,24 @@ struct FavoriteView: View {
                 
                 // Content
                 if songs.isEmpty {
-                    VStack(spacing: 20) {
+                    VStack {
                         Image(systemName: "heart.slash")
                             .font(.system(size: 60))
-                            .foregroundColor(.white.opacity(0.7))
-                        
-                        Text("No Favorite Songs")
+                            .padding()
+                        Text("No favorite songs")
                             .font(.title2)
-                            .foregroundColor(.white)
-                        
-                        Text("Add songs to your favorites from the Library")
-                            .font(.subheadline)
-                            .foregroundColor(.white.opacity(0.7))
-                            .multilineTextAlignment(.center)
-                            .padding(.horizontal)
+                        Text("Heart your favorite songs to see them here")
+                            .foregroundColor(.secondary)
                     }
+                    .foregroundColor(.white)
                 } else {
                     List {
                         ForEach(songs, id: \.self) { song in
                             SongRow(song: song)
                                 .contentShape(Rectangle())
                                 .listRowBackground(Color.clear)
-                                .listRowInsets(EdgeInsets(top: 8, leading: 16, bottom: 8, trailing: 16))
-                                .frame(height: 60)
+                                .listRowInsets(EdgeInsets(top: 4, leading: 0, bottom: 4, trailing: 0))
+                                .frame(height: 66)
                                 .onTapGesture {
                                     // Устанавливаем текущий плейлист как все избранные песни
                                     PlaylistManager.shared.setPlaylist(Array(songs))
@@ -85,28 +80,27 @@ struct FavoriteView: View {
         }
     }
     
-    private func removeFromFavorites(offsets: IndexSet) {
+    private func toggleFavorite(_ song: Song) {
         withAnimation {
-            offsets.map { songs[$0] }.forEach { song in
-                song.isFavorite = false
-            }
-            
+            song.isFavorite.toggle()
             do {
                 try viewContext.save()
             } catch {
-                print("Error removing from favorites: \(error.localizedDescription)")
+                print("Error toggling favorite: \(error)")
             }
         }
     }
     
-    private func toggleFavorite(_ song: Song) {
+    private func removeFromFavorites(at offsets: IndexSet) {
         withAnimation {
-            song.isFavorite.toggle()
-            
+            for index in offsets {
+                let song = songs[index]
+                song.isFavorite = false
+            }
             do {
                 try viewContext.save()
             } catch {
-                print("Error toggling favorite: \(error.localizedDescription)")
+                print("Error removing from favorites: \(error)")
             }
         }
     }
