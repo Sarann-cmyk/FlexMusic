@@ -37,6 +37,33 @@ enum ThemeMode: Int, CaseIterable {
     }
 }
 
+// Додамо нове перерахування для режимів фону плеєра
+enum PlayerBackgroundMode: Int, CaseIterable {
+    case staticGradient = 0
+    case dynamic = 1
+    
+    var description: String {
+        switch self {
+        case .staticGradient: return "Static gradient"
+        case .dynamic: return "Dynamic (based on cover)"
+        }
+    }
+    
+    var icon: String {
+        switch self {
+        case .staticGradient: return "rectangle.fill"
+        case .dynamic: return "rectangle.on.rectangle"
+        }
+    }
+    
+    var iconColor: Color {
+        switch self {
+        case .staticGradient: return .blue
+        case .dynamic: return .orange
+        }
+    }
+}
+
 class ThemeManager: ObservableObject {
     static let shared = ThemeManager()
     
@@ -45,6 +72,8 @@ class ThemeManager: ObservableObject {
             updateTheme()
         }
     }
+    
+    @AppStorage("playerBackgroundMode") var playerBackgroundMode: PlayerBackgroundMode = .staticGradient
     
     @AppStorage("isDarkMode") private var isDarkMode: Bool = false
     @Published var colorScheme: ColorScheme?
