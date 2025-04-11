@@ -10,22 +10,27 @@ import SwiftUI
 
 class AppDelegate: NSObject, UIApplicationDelegate {
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey : Any]? = nil) -> Bool {
+        print("AppDelegate: App starting...")
         
-        // Визначаємо поточну тему
-        let isDarkMode = UITraitCollection.current.userInterfaceStyle == .dark
+        // Визначаємо поточну тему через ThemeManager
+        let themeManager = ThemeManager.shared
+        let isDarkMode = themeManager.themeMode == .dark
         
-        // Застосовуємо відповідні налаштування TabBar
+        print("AppDelegate: Current app theme is \(isDarkMode ? "DARK" : "LIGHT")")
+        
+        // Застосовуємо відповідні налаштування
         if isDarkMode {
             TabBarAppearance.configureForDarkMode()
-            // Застосовуємо спеціальні налаштування для навігаційного бару
             NavigationBarStyler.applyDarkTheme()
         } else {
             TabBarAppearance.configureForLightMode()
-            // Застосовуємо спеціальні налаштування для навігаційного бару
             NavigationBarStyler.applyLightTheme()
         }
         
-        print("AppDelegate: App started with isDarkMode=\(isDarkMode)")
+        // Примусово оновлюємо всі навігаційні бари
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+            NavigationBarStyler.forceRefreshAllNavigationBars()
+        }
         
         return true
     }
@@ -34,23 +39,25 @@ class AppDelegate: NSObject, UIApplicationDelegate {
     func applicationDidBecomeActive(_ application: UIApplication) {
         print("AppDelegate: App became active")
         
-        // Визначаємо і застосовуємо поточну тему
+        // Визначаємо і застосовуємо поточну тему через ThemeManager
         let themeManager = ThemeManager.shared
-        let isDarkModeSelected = themeManager.themeMode == .dark || 
-            (themeManager.themeMode == .system && UITraitCollection.current.userInterfaceStyle == .dark)
+        let isDarkMode = themeManager.themeMode == .dark
         
-        if isDarkModeSelected {
+        print("AppDelegate: Reapplying theme on active, isDarkMode=\(isDarkMode)")
+        
+        // Спочатку скидаємо налаштування
+        NavigationBarStyler.resetNavigationBarAppearance()
+        
+        if isDarkMode {
             NavigationBarStyler.applyDarkTheme()
             TabBarAppearance.configureForDarkMode()
-            print("AppDelegate: Reapplied DARK theme on app active")
         } else {
             NavigationBarStyler.applyLightTheme()
             TabBarAppearance.configureForLightMode()
-            print("AppDelegate: Reapplied LIGHT theme on app active")
         }
         
         // Примусово оновлюємо всі навігаційні бари
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
             NavigationBarStyler.forceRefreshAllNavigationBars()
         }
     }
@@ -62,7 +69,7 @@ class AppDelegate: NSObject, UIApplicationDelegate {
         UIKitReset.resetAllAppearances()
         
         // Додатково примусово оновлюємо тему через ThemeManager
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
             ThemeManager.shared.updateTheme()
         }
     }

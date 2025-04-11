@@ -15,48 +15,50 @@ struct NavigationBarStyler {
     static func applyDarkTheme() {
         let darkColor = UIColor.black
         
-        // Налаштування для основних стилів UIKit
-        UINavigationBar.appearance().barStyle = .black
-        UINavigationBar.appearance().barTintColor = darkColor
-        UINavigationBar.appearance().tintColor = UIColor.white
-        UINavigationBar.appearance().isTranslucent = true
-                
-        // Створюємо новий appearance спеціально для темної теми
-        let navigationBarAppearance = UINavigationBarAppearance()
-        navigationBarAppearance.configureWithOpaqueBackground()
-        navigationBarAppearance.backgroundColor = darkColor
+        // Примусово встановлюємо темний режим для всіх вікон
+        if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene {
+            for window in windowScene.windows {
+                window.overrideUserInterfaceStyle = .dark
+            }
+        }
         
-        // Налаштовуємо стиль тексту - колір та атрибути
-        navigationBarAppearance.titleTextAttributes = [
-            .foregroundColor: UIColor.white,
-            .font: UIFont.boldSystemFont(ofSize: 17)
-        ]
-        
-        navigationBarAppearance.largeTitleTextAttributes = [
-            .foregroundColor: UIColor.white,
-            .font: UIFont.boldSystemFont(ofSize: 34)
-        ]
-        
-        // Налаштування кнопок
-        let barButtonItemAppearance = UIBarButtonItemAppearance(style: .plain)
-        barButtonItemAppearance.normal.titleTextAttributes = [.foregroundColor: UIColor.white]
-        barButtonItemAppearance.disabled.titleTextAttributes = [.foregroundColor: UIColor.white.withAlphaComponent(0.3)]
-        barButtonItemAppearance.highlighted.titleTextAttributes = [.foregroundColor: UIColor.white]
-        barButtonItemAppearance.focused.titleTextAttributes = [.foregroundColor: UIColor.white]
-        
-        navigationBarAppearance.buttonAppearance = barButtonItemAppearance
-        navigationBarAppearance.backButtonAppearance = barButtonItemAppearance
-        
-        // Застосовуємо налаштування напряму через UIKit
-        UINavigationBar.appearance().standardAppearance = navigationBarAppearance
-        UINavigationBar.appearance().scrollEdgeAppearance = navigationBarAppearance
-        UINavigationBar.appearance().compactAppearance = navigationBarAppearance
-        
-        // Застосовуємо до всіх активних навігаційних контролерів
-        applyToAllActiveNavigationControllers(appearance: navigationBarAppearance, barTintColor: darkColor, tintColor: UIColor.white)
-        
-        // Примусове оновлення навігаційного бару в усіх контролерах
-        forceRefreshAllNavigationBars()
+        // Виконуємо налаштування з затримкою 0.1 сек
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+            let navigationBarAppearance = UINavigationBarAppearance()
+            navigationBarAppearance.configureWithOpaqueBackground() // Запобігає прозорості
+            navigationBarAppearance.backgroundColor = darkColor // Чіткий чорний колір
+            
+            // Налаштування кольору тексту
+            navigationBarAppearance.titleTextAttributes = [
+                .foregroundColor: UIColor.white, // Білий текст
+                .font: UIFont.boldSystemFont(ofSize: 17)
+            ]
+            
+            navigationBarAppearance.largeTitleTextAttributes = [
+                .foregroundColor: UIColor.white,
+                .font: UIFont.boldSystemFont(ofSize: 34)
+            ]
+            
+            // Налаштування кнопок
+            let barButtonItemAppearance = UIBarButtonItemAppearance(style: .plain)
+            barButtonItemAppearance.normal.titleTextAttributes = [.foregroundColor: UIColor.white]
+            barButtonItemAppearance.disabled.titleTextAttributes = [.foregroundColor: UIColor.white.withAlphaComponent(0.3)]
+            barButtonItemAppearance.highlighted.titleTextAttributes = [.foregroundColor: UIColor.white]
+            barButtonItemAppearance.focused.titleTextAttributes = [.foregroundColor: UIColor.white]
+            
+            navigationBarAppearance.buttonAppearance = barButtonItemAppearance
+            navigationBarAppearance.backButtonAppearance = barButtonItemAppearance
+            
+            UINavigationBar.appearance().standardAppearance = navigationBarAppearance
+            UINavigationBar.appearance().scrollEdgeAppearance = navigationBarAppearance
+            UINavigationBar.appearance().compactAppearance = navigationBarAppearance
+            
+            // Застосовуємо до всіх активних навігаційних контролерів
+            applyToAllActiveNavigationControllers(appearance: navigationBarAppearance, barTintColor: darkColor, tintColor: UIColor.white)
+            
+            // Примусове оновлення навігаційних контролерів
+            forceRefreshAllNavigationBars()
+        }
         
         print("NavigationBarStyler: Applied DARK style for dark mode")
     }
@@ -164,6 +166,13 @@ struct NavigationBarStyler {
     /// Застосувати стиль для світлої теми
     static func applyLightTheme() {
         let lightColor = UIColor(Color("topBacground"))
+        
+        // Примусово встановлюємо світлий стиль для всіх вікон
+        if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene {
+            for window in windowScene.windows {
+                window.overrideUserInterfaceStyle = .light
+            }
+        }
         
         // Налаштування для основних стилів UIKit
         UINavigationBar.appearance().barStyle = .default

@@ -85,16 +85,16 @@ class ThemeManager: ObservableObject {
         TabBarAppearance.reset()
         NavigationBarStyler.resetNavigationBarAppearance()
         
-        // Визначаємо, чи темна тема активна
-        let isDarkMode = UITraitCollection.current.userInterfaceStyle == .dark || themeMode == .dark
+        // Визначаємо тему виключно на основі налаштувань додатку
+        let isDarkMode = themeMode == .dark
+        
+        print("ThemeManager: Initial theme is \(isDarkMode ? "DARK" : "LIGHT")")
         
         // Застосовуємо відповідний стиль для навігаційного бару
         if isDarkMode {
             NavigationBarStyler.applyDarkTheme()
-            print("ThemeManager: Applied dark navigation bar at startup")
         } else {
             NavigationBarStyler.applyLightTheme()
-            print("ThemeManager: Applied light navigation bar at startup")
         }
         
         // Оновлюємо тему після застосування стилів
@@ -102,7 +102,7 @@ class ThemeManager: ObservableObject {
     }
     
     func updateTheme() {
-        // Визначаємо чи темна тема активна
+        // Визначаємо тему виключно на основі налаштувань додатку
         switch themeMode {
         case .light:
             colorScheme = .light
@@ -121,12 +121,14 @@ class ThemeManager: ObservableObject {
             NavigationBarStyler.applyDarkTheme()
             
         case .system:
-            colorScheme = nil // використовувати системні налаштування
-            let systemIsDark = UITraitCollection.current.userInterfaceStyle == .dark
-            print("ThemeManager: System theme selected (isDark: \(systemIsDark))")
+            // Для системної теми використовуємо налаштування додатку
+            colorScheme = nil
+            let isDarkMode = themeMode == .dark
             
-            // Застосовуємо налаштування в залежності від системної теми
-            if systemIsDark {
+            print("ThemeManager: System theme selected, using \(isDarkMode ? "DARK" : "LIGHT")")
+            
+            // Застосовуємо налаштування в залежності від налаштувань додатку
+            if isDarkMode {
                 TabBarAppearance.configureForDarkMode()
                 NavigationBarStyler.applyDarkTheme()
             } else {
@@ -143,14 +145,6 @@ class ThemeManager: ObservableObject {
         // Примусово оновлюємо всі навігаційні бари з невеликою затримкою
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
             NavigationBarStyler.forceRefreshAllNavigationBars()
-            
-            // Додатково запускаємо UIThemeManager для більш надійного застосування налаштувань
-            let isDarkMode = self.themeMode == .dark || 
-                (self.themeMode == .system && UITraitCollection.current.userInterfaceStyle == .dark)
-            
-            UIThemeManager.shared.applyTheme(isDarkMode: isDarkMode)
-            
-            print("ThemeManager: Theme update completed with additional refresh")
         }
     }
 }

@@ -59,7 +59,7 @@ struct PlayerView: View {
     }
     
     var body: some View {
-        NavigationView {
+        NavigationStack {
             ZStack {
                 // Фон в залежності від налаштувань
                 if themeManager.playerBackgroundMode == .staticGradient || dominantColor == nil {
@@ -287,6 +287,30 @@ struct PlayerView: View {
             }
             .navigationTitle("Now Playing")
             .navigationBarTitleDisplayMode(.inline)
+            .onAppear {
+                // Оновлюємо навігаційний бар при відкритті вкладки
+                if themeManager.themeMode == .dark {
+                    NavigationBarStyler.applyDarkTheme()
+                } else {
+                    NavigationBarStyler.applyLightTheme()
+                }
+            }
+            .onChange(of: themeManager.themeMode) { newTheme in
+                // Оновлюємо навігаційний бар при зміні теми
+                if newTheme == .dark {
+                    NavigationBarStyler.applyDarkTheme()
+                } else {
+                    NavigationBarStyler.applyLightTheme()
+                }
+            }
+            .onChange(of: UITraitCollection.current.userInterfaceStyle) { _ in
+                // Оновлюємо навігаційний бар при зміні системної теми
+                if themeManager.themeMode == .dark {
+                    NavigationBarStyler.applyDarkTheme()
+                } else {
+                    NavigationBarStyler.applyLightTheme()
+                }
+            }
             .sheet(isPresented: $showingSleepPicker) {
                 SleepTimerSheet(
                     isPresented: $showingSleepPicker,
