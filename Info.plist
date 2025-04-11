@@ -6,6 +6,8 @@
 <string>We need access to your music library to play songs.</string>
 <key>NSMicrophoneUsageDescription</key>
 <string>We need access to the microphone for audio playback.</string>
+<key>UIUserInterfaceStyle</key>
+<string>Light</string>
 	<key>UIBackgroundModes</key>
 	<array>
 		<string></string>
