@@ -43,6 +43,7 @@ struct LibraryView: View {
     @Environment(\.managedObjectContext) private var viewContext
     @FetchRequest(
         sortDescriptors: [NSSortDescriptor(keyPath: \Playlist.createdAt, ascending: false)],
+        predicate: NSPredicate(format: "NOT (name BEGINSWITH[c] %@)", "★ "),
         animation: .default)
     private var playlists: FetchedResults<Playlist>
     

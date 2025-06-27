@@ -334,8 +334,12 @@ struct PlaylistDetailView: View {
     private func toggleFavorite(_ song: Song) {
         withAnimation {
             song.isFavorite.toggle()
+            if !song.isFavorite {
+                playlist.removeFromSongs(song)
+            }
             do {
                 try viewContext.save()
+                songs = playlist.songsArray
             } catch {
                 print("Error toggling favorite: \(error)")
             }
