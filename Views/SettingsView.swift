@@ -35,25 +35,39 @@ struct SettingsView: View {
                 
                 VStack {
                     List {
-                        Section(header: Text("Appearance")) {
-                            NavigationLink(destination: ThemeSettingsView()) {
+                        Section(header: Text("Theme")) {
+                            Menu {
+                                ForEach(ThemeMode.allCases, id: \.rawValue) { mode in
+                                    Button(action: {
+                                        withAnimation {
+                                            themeManager.themeMode = mode
+                                        }
+                                    }) {
+                                        Label(mode.description, systemImage: mode.icon)
+                                    }
+                                }
+                            } label: {
                                 HStack {
                                     Image(systemName: themeManager.themeMode.icon)
                                         .foregroundColor(themeManager.themeMode.iconColor)
                                         .imageScale(.large)
                                         .frame(width: 30, height: 30)
-                                    
                                     VStack(alignment: .leading) {
                                         Text("Theme")
                                             .fontWeight(.medium)
-                                        
                                         Text(themeManager.themeMode.description)
                                             .font(.caption)
                                             .foregroundColor(.secondary)
                                     }
+                                    Spacer()
+                                    Image(systemName: "chevron.down")
+                                        .foregroundColor(.secondary)
                                 }
                             }
-                            
+                        }
+                        .listRowBackground(Color.clear)
+                        
+                        Section(header: Text("Dynamic Background")) {
                             Toggle(isOn: $dynamicBackgroundManager.isDynamicBackgroundEnabled) {
                                 HStack {
                                     Image(systemName: "paintpalette")
@@ -72,6 +86,7 @@ struct SettingsView: View {
                                 }
                             }
                         }
+                        .listRowBackground(Color.clear)
                         
                         Section(header: Text("Пропуск тиші")) {
                             Toggle("Пропускати тишу в кінці", isOn: $skipSilenceAtEnd)
@@ -83,6 +98,7 @@ struct SettingsView: View {
                                         audioManager.startSilenceDetection()
                                     }
                                 }
+                            .listRowBackground(Color.clear)
                         }
                         
                         Section(header: Text("About")) {
@@ -95,6 +111,7 @@ struct SettingsView: View {
                                 Text("FlexMusic Version 1.0")
                                     .fontWeight(.medium)
                             }
+                            .listRowBackground(Color.clear)
                         }
                     }
                     .listStyle(.insetGrouped)
@@ -186,6 +203,7 @@ struct ThemeSettingsView: View {
                             .buttonStyle(.plain)
                             .disabled(isUpdating)
                         }
+                        .listRowBackground(Color.clear)
                     }
                 }
                 .listStyle(.insetGrouped)
