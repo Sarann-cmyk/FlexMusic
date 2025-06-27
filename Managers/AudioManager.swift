@@ -282,6 +282,9 @@ class AudioManager: NSObject, ObservableObject {
                     try? song.managedObjectContext?.save()
                 }
                 
+                song.playCount += 1
+                try? song.managedObjectContext?.save()
+                
                 updateNowPlayingInfo()
             }
         } catch {

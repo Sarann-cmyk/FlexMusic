@@ -29,6 +29,7 @@ struct FavoriteView: View {
     @State private var showAddToPlaylistMenu = false
     @State private var renamingPlaylist: Playlist? = nil
     @State private var renameText: String = ""
+    @State private var sortOption: TrackSortOption = .dateAdded
     
     private var ungroupedFavoriteSongs: [Song] {
         songs.filter { song in
@@ -36,6 +37,10 @@ struct FavoriteView: View {
                 (playlist.songsArray.contains { $0 == song })
             })
         }
+    }
+    
+    private var sortedUngroupedFavoriteSongs: [Song] {
+        TrackSortManager.sort(songs: ungroupedFavoriteSongs, by: sortOption)
     }
     
     // Додаю параметри для сітки плейлістів
@@ -61,11 +66,11 @@ struct FavoriteView: View {
                     // Плейлісти Favorites (тепер горизонтальний ScrollView з HStack)
                     if !favoritePlaylists.isEmpty {
                         ScrollView(.horizontal, showsIndicators: false) {
-                            HStack(spacing: 20) {
+                            HStack(spacing: 16) {
                                 ForEach(favoritePlaylists) { playlist in
                                     NavigationLink(destination: PlaylistDetailView(playlist: playlist, selectedTab: $selectedTab)) {
                                         PlaylistItem(playlist: playlist)
-                                            .frame(width: 130)
+                                            .frame(width: 100)
                                     }
                                     .contextMenu {
                                         Button(role: .destructive) {
@@ -105,7 +110,7 @@ struct FavoriteView: View {
                         }
                     } else {
                         List {
-                            ForEach(ungroupedFavoriteSongs, id: \.self) { song in
+                            ForEach(sortedUngroupedFavoriteSongs, id: \.self) { song in
                                 SongRow(song: song)
                                     .contentShape(Rectangle())
                                     .listRowBackground(Color.clear)
@@ -153,13 +158,26 @@ struct FavoriteView: View {
                         .foregroundColor(Color("playerControls"))
                         .font(.headline)
                 }
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    Button(action: {
-                        showingAddPlaylist = true
-                    }) {
-                        Image(systemName: "plus")
-                            .font(.system(size: 18, weight: .regular))
-                            .foregroundColor(Color("playerControls"))
+                ToolbarItemGroup(placement: .navigationBarTrailing) {
+                    HStack(spacing: 8) {
+                        Menu {
+                            ForEach(TrackSortOption.allCases, id: \.self) { option in
+                                Button(option.rawValue) {
+                                    sortOption = option
+                                }
+                            }
+                        } label: {
+                            Image(systemName: "arrow.up.arrow.down")
+                                .font(.system(size: 18, weight: .regular))
+                                .foregroundColor(Color("playerControls"))
+                        }
+                        Button(action: {
+                            showingAddPlaylist = true
+                        }) {
+                            Image(systemName: "plus")
+                                .font(.system(size: 18, weight: .regular))
+                                .foregroundColor(Color("playerControls"))
+                        }
                     }
                 }
             }
@@ -263,43 +281,53 @@ struct FavoriteView: View {
     
     // Додаю PlaylistItem як у LibraryView
     private func PlaylistItem(playlist: Playlist) -> some View {
-        VStack(spacing: 6) {
+        VStack(spacing: 4) {
             ZStack {
-                Rectangle()
-                    .fill(Color(hex: playlist.colorHex ?? "#007AFF"))
-                    .aspectRatio(1, contentMode: .fit)
-                    .cornerRadius(12)
-                    .shadow(color: .black.opacity(0.2), radius: 4, x: 0, y: 2)
-                if let coverData = playlist.coverImageData, let uiImage = UIImage(data: coverData) {
+                if let coverData = findCoverImageData(for: playlist), let uiImage = UIImage(data: coverData) {
                     Image(uiImage: uiImage)
                         .resizable()
                         .aspectRatio(contentMode: .fill)
                         .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: .infinity)
-                        .clipShape(RoundedRectangle(cornerRadius: 12))
+                        .clipShape(RoundedRectangle(cornerRadius: 10))
                 } else {
+                    Rectangle()
+                        .fill(Color(hex: playlist.colorHex ?? "#007AFF"))
+                        .aspectRatio(1, contentMode: .fit)
+                        .cornerRadius(10)
+                        .shadow(color: .black.opacity(0.2), radius: 3, x: 0, y: 1)
                     Image(systemName: "music.note.list")
-                        .font(.system(size: 30))
+                        .font(.system(size: 22))
                         .foregroundColor(Color("playerControls"))
                 }
             }
             .aspectRatio(1, contentMode: .fit)
             .overlay(
-                RoundedRectangle(cornerRadius: 12)
+                RoundedRectangle(cornerRadius: 10)
                     .stroke(Color.white.opacity(0.2), lineWidth: 0.5)
             )
-            VStack(spacing: 2) {
+            VStack(spacing: 1) {
                 Text(playlist.name?.replacingOccurrences(of: "★ ", with: "") ?? "")
                     .foregroundColor(Color("playerControls"))
-                    .font(.system(size: 14, weight: .medium))
+                    .font(.system(size: 11, weight: .medium))
                     .lineLimit(1)
                 Text("\(playlist.songsArray.count) songs")
                     .foregroundColor(Color("playerControls").opacity(0.7))
-                    .font(.system(size: 12))
+                    .font(.system(size: 9))
                     .lineLimit(1)
             }
-            .padding(.horizontal, 4)
-            .padding(.bottom, 6)
+            .padding(.horizontal, 2)
+            .padding(.bottom, 4)
         }
+    }
+    
+    // Пошук першої обкладинки з треків плейліста
+    private func findCoverImageData(for playlist: Playlist) -> Data? {
+        for song in playlist.songsArray {
+            if let data = song.coverImageData, !data.isEmpty {
+                return data
+            }
+        }
+        return nil
     }
     
     private func deleteFavoritePlaylist(_ playlist: Playlist) {

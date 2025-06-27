@@ -221,50 +221,6 @@ struct LibraryView: View {
         }
     }
     
-    // Кнопка создания нового плейлиста
-    private var newPlaylistButton: some View {
-        Button(action: {
-            showFileImporter = true
-        }) {
-            VStack(spacing: 6) {
-                ZStack {
-                    Rectangle()
-                        .fill(Color("playerControls").opacity(0.1))
-                        .aspectRatio(1, contentMode: .fit)
-                        .cornerRadius(12)
-                        .shadow(color: .black.opacity(0.2), radius: 4, x: 0, y: 2)
-                    VStack {
-                        Image(systemName: "plus.circle.fill")
-                            .font(.system(size: 36))
-                            .foregroundColor(Color("playerControls"))
-                            .shadow(color: .black.opacity(0.3), radius: 2, x: 0, y: 1)
-                        Text("Create Playlist")
-                            .font(.system(size: 12, weight: .medium))
-                            .foregroundColor(Color("playerControls"))
-                            .padding(.top, 8)
-                    }
-                }
-                .aspectRatio(1, contentMode: .fit)
-                .overlay(
-                    RoundedRectangle(cornerRadius: 12)
-                        .stroke(Color("playerControls").opacity(0.2), lineWidth: 0.5)
-                )
-                VStack(spacing: 2) {
-                    Text("New Playlist")
-                        .foregroundColor(Color("playerControls"))
-                        .font(.system(size: 14, weight: .medium))
-                        .lineLimit(1)
-                    Text("Add songs")
-                        .foregroundColor(Color("playerControls").opacity(0.7))
-                        .font(.system(size: 12))
-                        .lineLimit(1)
-                }
-                .padding(.horizontal, 4)
-                .padding(.bottom, 6)
-            }
-        }
-    }
-    
     private func handlePlaylistCreation(with urls: [URL]) {
         guard !urls.isEmpty else { return }
         let parentFolders = Set(urls.map { $0.deletingLastPathComponent().lastPathComponent })
@@ -449,8 +405,6 @@ struct LibraryView: View {
                             .padding(.bottom, 4)
                         
                         LazyVGrid(columns: columns, spacing: 16) {
-                            newPlaylistButton
-                            
                             ForEach(playlists) { playlist in
                                 NavigationLink(
                                     destination: PlaylistDetailView(
@@ -473,6 +427,15 @@ struct LibraryView: View {
                     Text("Library")
                         .foregroundColor(Color("playerControls"))
                         .font(.headline)
+                }
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button(action: {
+                        showFileImporter = true
+                    }) {
+                        Image(systemName: "plus")
+                            .font(.system(size: 18, weight: .regular))
+                            .foregroundColor(Color("playerControls"))
+                    }
                 }
             }
         }

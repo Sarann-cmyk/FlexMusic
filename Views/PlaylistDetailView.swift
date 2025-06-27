@@ -17,6 +17,7 @@ struct PlaylistDetailView: View {
     @State private var importError: Error?
     @State private var showAlert = false
     @State private var songs: [Song] = []
+    @State private var sortOption: TrackSortOption = .dateAdded
     @Binding var selectedTab: Int
     @State private var pendingPlaylistName: String? = nil
     @State private var pendingFileURLs: [URL] = []
@@ -46,7 +47,17 @@ struct PlaylistDetailView: View {
                     .font(.headline)
             }
             ToolbarItem(placement: .navigationBarTrailing) {
-                newPlaylistButton
+                Menu {
+                    ForEach(TrackSortOption.allCases, id: \.self) { option in
+                        Button(option.rawValue) {
+                            sortOption = option
+                        }
+                    }
+                } label: {
+                    Image(systemName: "arrow.up.arrow.down")
+                        .font(.system(size: 18, weight: .regular))
+                        .foregroundColor(Color("playerControls"))
+                }
             }
         }
         .fileImporter(
@@ -108,9 +119,13 @@ struct PlaylistDetailView: View {
         .foregroundColor(.white)
     }
     
+    private var sortedSongs: [Song] {
+        TrackSortManager.sort(songs: songs, by: sortOption)
+    }
+    
     private var songsListView: some View {
         List {
-            ForEach(songs) { song in
+            ForEach(sortedSongs) { song in
                 SongRow(song: song)
                     .listRowBackground(Color.clear)
                     .contentShape(Rectangle())
@@ -118,7 +133,7 @@ struct PlaylistDetailView: View {
                     .frame(height: 60)
                     .onTapGesture {
                         print("Tapped song: \(song.title ?? "Unknown")")
-                        PlaylistManager.shared.setPlaylist(songs)
+                        PlaylistManager.shared.setPlaylist(sortedSongs)
                         AudioManager.shared.playSong(song)
                         selectedTab = 1
                     }
