@@ -27,4 +27,5 @@
 "unknown_error" = "Сталася невідома помилка";
 "no_songs_in_playlist" = "У плейлісті немає пісень";
 "tap_plus_to_add_songs" = "Натисніть +, щоб додати пісні";
-"now_playing" = "Зараз грає"; 
+"now_playing" = "Зараз грає";
+"feedback" = "Зворотний зв'язок"; 

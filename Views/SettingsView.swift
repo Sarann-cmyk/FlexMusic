@@ -146,7 +146,7 @@ struct SettingsView: View {
                                         .foregroundColor(.blue)
                                         .imageScale(.large)
                                         .frame(width: 30, height: 30)
-                                    Text("Зворотний зв'язок")
+                                    Text(localizationManager.localizedString(forKey: "feedback"))
                                         .fontWeight(.medium)
                                     Spacer()
                                     Image(systemName: "chevron.right")

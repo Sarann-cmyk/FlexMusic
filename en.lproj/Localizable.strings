@@ -27,4 +27,5 @@
 "unknown_error" = "Unknown error occurred";
 "no_songs_in_playlist" = "No songs in playlist";
 "tap_plus_to_add_songs" = "Tap the + button to add songs";
-"now_playing" = "Now Playing"; 
+"now_playing" = "Now Playing";
+"feedback" = "Feedback"; 
