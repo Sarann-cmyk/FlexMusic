@@ -21,6 +21,7 @@ struct PlayerView: View {
     @State private var swipeOffset: CGFloat = 0
     @State private var isSwiping: Bool = false
     @State private var isInitialLoad = true
+    @State private var isFavorite: Bool = false
     
     private let sleepOptions: [TimeInterval] = [
         0,      // Выключено
@@ -207,9 +208,14 @@ struct PlayerView: View {
                 isInitialLoad = false
                 dynamicBackgroundManager.updateBackground(from: audioManager.currentSong?.coverImageData)
             }
+            isFavorite = audioManager.currentSong?.isFavorite ?? false
         }
-        .onChange(of: audioManager.currentSong) { _ in
+        .onChange(of: audioManager.currentSong) { newSong in
             dynamicBackgroundManager.updateBackground(from: audioManager.currentSong?.coverImageData)
+            isFavorite = newSong?.isFavorite ?? false
+        }
+        .onChange(of: audioManager.currentSong?.isFavorite) { newValue in
+            isFavorite = newValue ?? false
         }
     }
     
@@ -357,9 +363,9 @@ struct PlayerView: View {
             
             Button(action: toggleFavorite) {
                 VStack(spacing: 2) {
-                    Image(systemName: audioManager.currentSong?.isFavorite ?? false ? "heart.fill" : "heart")
+                    Image(systemName: isFavorite ? "heart.fill" : "heart")
                         .font(.system(size: 28))
-                        .foregroundColor(audioManager.currentSong?.isFavorite ?? false ? .pink : (dynamicBackgroundManager.isDynamicBackgroundEnabled ? dynamicBackgroundManager.controlButtonColor : Color("playerControls")))
+                        .foregroundColor(isFavorite ? .pink : (dynamicBackgroundManager.isDynamicBackgroundEnabled ? dynamicBackgroundManager.controlButtonColor : Color("playerControls")))
                         .shadow(color: .black.opacity(0.3), radius: 2, x: 0, y: 1)
                     Color.clear
                         .frame(height: 12)
@@ -428,6 +434,7 @@ struct PlayerView: View {
     private func toggleFavorite() {
         guard let song = audioManager.currentSong else { return }
         song.isFavorite.toggle()
+        isFavorite = song.isFavorite
         do {
             try viewContext.save()
         } catch {
