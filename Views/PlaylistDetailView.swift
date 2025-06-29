@@ -13,6 +13,7 @@ import AVFoundation
 struct PlaylistDetailView: View {
     @ObservedObject var playlist: Playlist
     @Environment(\.managedObjectContext) private var viewContext
+    @EnvironmentObject private var localizationManager: LocalizationManager
     @State private var showFileImporter = false
     @State private var importError: Error?
     @State private var showAlert = false
@@ -29,6 +30,7 @@ struct PlaylistDetailView: View {
     }
     
     var body: some View {
+        let _ = localizationManager.currentLanguage
         ZStack {
             backgroundGradient
             
@@ -38,11 +40,11 @@ struct PlaylistDetailView: View {
                 songsListView
             }
         }
-        .navigationTitle(playlist.name ?? "Playlist")
+        .navigationTitle((playlist.name ?? localizationManager.localizedString(forKey: "playlist")))
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .principal) {
-                Text(playlist.name ?? "Playlist")
+                Text(playlist.name ?? localizationManager.localizedString(forKey: "playlist"))
                     .foregroundColor(Color("playerControls"))
                     .font(.headline)
             }
@@ -73,10 +75,10 @@ struct PlaylistDetailView: View {
                 showAlert = true
             }
         }
-        .alert("Import Error", isPresented: $showAlert) {
-            Button("OK") {}
+        .alert(localizationManager.localizedString(forKey: "import_error"), isPresented: $showAlert) {
+            Button(localizationManager.localizedString(forKey: "OK")) {}
         } message: {
-            Text(importError?.localizedDescription ?? "Unknown error occurred")
+            Text(importError?.localizedDescription ?? localizationManager.localizedString(forKey: "unknown_error"))
         }
         .onAppear {
             // Загрузка песен при появлении представления
@@ -106,12 +108,12 @@ struct PlaylistDetailView: View {
                         .shadow(color: .black.opacity(0.3), radius: 2, x: 0, y: 1)
                 }
                 
-                Text("No songs in playlist")
+                Text(localizationManager.localizedString(forKey: "no_songs_in_playlist"))
                     .font(.system(size: 16, weight: .medium))
                     .foregroundColor(Color("playerControls"))
                     .padding(.top, 8)
                 
-                Text("Tap the + button to add songs")
+                Text(localizationManager.localizedString(forKey: "tap_plus_to_add_songs"))
                     .font(.system(size: 14))
                     .foregroundColor(Color("playerControls").opacity(0.7))
                     .padding(.top, 4)

@@ -10,6 +10,7 @@ import CoreData
 
 struct PlayerView: View {
     @Environment(\.managedObjectContext) private var viewContext
+    @EnvironmentObject private var localizationManager: LocalizationManager
     @StateObject private var audioManager = AudioManager.shared
     @StateObject private var playlistManager = PlaylistManager.shared
     @StateObject private var dynamicBackgroundManager = DynamicBackgroundManager.shared
@@ -34,6 +35,7 @@ struct PlayerView: View {
     private let playbackRates: [Double] = [0.5, 0.75, 1.0, 1.25, 1.5, 1.75, 2.0]
     
     var body: some View {
+        let _ = localizationManager.currentLanguage
         NavigationView {
             ZStack {
                 // Background
@@ -170,11 +172,11 @@ struct PlayerView: View {
                     Spacer()
                 }
             }
-            .navigationTitle("Now Playing")
+            .navigationTitle(localizationManager.localizedString(forKey: "now_playing"))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .principal) {
-                    Text("Now Playing")
+                    Text(localizationManager.localizedString(forKey: "now_playing"))
                         .foregroundColor(dynamicBackgroundManager.isDynamicBackgroundEnabled ? dynamicBackgroundManager.controlButtonColor : Color("playerControls"))
                         .font(.headline)
                 }

@@ -14,6 +14,7 @@ struct ContentView: View {
     @Environment(\.managedObjectContext) private var viewContext
     @Environment(\.colorScheme) private var systemColorScheme
     @EnvironmentObject private var themeManager: ThemeManager
+    @EnvironmentObject private var localizationManager: LocalizationManager
     @State private var selectedTab = 1
     
     var currentColorScheme: ColorScheme {
@@ -22,29 +23,30 @@ struct ContentView: View {
     }
     
     var body: some View {
+        let _ = localizationManager.currentLanguage
         TabView(selection: $selectedTab) {
             FavoriteView(selectedTab: $selectedTab)
                 .tabItem {
-                    Label("Favorites", systemImage: "heart.fill")
+                    Label(localizationManager.localizedString(forKey: "favorites"), systemImage: "heart.fill")
                 }
                 .tag(0)
             
             PlayerView()
                 .tabItem {
-                    Label("Player", systemImage: "play.circle.fill")
+                    Label(localizationManager.localizedString(forKey: "player"), systemImage: "play.circle.fill")
                 }
                 .tag(1)
             
             LibraryView(selectedTab: $selectedTab)
                 .tabItem {
-                    Label("Library", systemImage: "music.note.list")
+                    Label(localizationManager.localizedString(forKey: "library"), systemImage: "music.note.list")
                 }
                 .tag(2)
             
             // Добавляем вкладку Settings
             SettingsView()
                 .tabItem {
-                    Label("Settings", systemImage: "gear")
+                    Label(localizationManager.localizedString(forKey: "settings"), systemImage: "gear")
                 }
                 .tag(4)
         }

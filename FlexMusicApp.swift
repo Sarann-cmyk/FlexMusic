@@ -12,6 +12,7 @@ import CoreData
 struct FlexMusicApp: App {
     let persistenceController = PersistenceController.shared
     @StateObject private var themeManager = ThemeManager.shared
+    @StateObject private var localizationManager = LocalizationManager.shared
     
     init() {
         // Налаштування навігаційної панелі
@@ -26,6 +27,7 @@ struct FlexMusicApp: App {
                 .environment(\.managedObjectContext, persistenceController.container.viewContext)
                 .preferredColorScheme(themeManager.colorScheme)
                 .environmentObject(themeManager)
+                .environmentObject(localizationManager)
         }
     }
 }

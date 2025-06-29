@@ -1,0 +1,42 @@
+/* English */
+"settings" = "Settings";
+"theme" = "Theme";
+"dynamic_background" = "Dynamic Background";
+"skip_silence" = "Skip silence at end";
+"about" = "About";
+"version" = "FlexMusic Version 1.0";
+"favorites" = "Favorites";
+"library" = "Library";
+"player" = "Player";
+"add_playlist" = "Add Playlist";
+"new_playlist" = "New Playlist";
+"rename_playlist" = "Rename Playlist";
+"cancel" = "Cancel";
+"create" = "Create";
+"save" = "Save";
+"enter_new_name" = "Enter new name for playlist";
+"language" = "Language";
+"english" = "English";
+"ukrainian" = "Ukrainian";
+
+/* Ukrainian */
+/* uk.lproj/Localizable.strings */
+"settings" = "Налаштування";
+"theme" = "Тема";
+"dynamic_background" = "Динамічний фон";
+"skip_silence" = "Пропускати тишу в кінці";
+"about" = "Про додаток";
+"version" = "FlexMusic Версія 1.0";
+"favorites" = "Улюблене";
+"library" = "Бібліотека";
+"player" = "Плеєр";
+"add_playlist" = "Додати плейліст";
+"new_playlist" = "Новий плейліст";
+"rename_playlist" = "Перейменувати плейліст";
+"cancel" = "Скасувати";
+"create" = "Створити";
+"save" = "Зберегти";
+"enter_new_name" = "Введіть нову назву для плейліста";
+"language" = "Мова";
+"english" = "Англійська";
+"ukrainian" = "Українська"; 

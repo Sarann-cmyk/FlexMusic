@@ -41,6 +41,7 @@ extension Color {
 
 struct LibraryView: View {
     @Environment(\.managedObjectContext) private var viewContext
+    @EnvironmentObject private var localizationManager: LocalizationManager
     @FetchRequest(
         sortDescriptors: [NSSortDescriptor(keyPath: \Playlist.createdAt, ascending: false)],
         predicate: NSPredicate(format: "NOT (name BEGINSWITH[c] %@)", "★ "),
@@ -382,6 +383,7 @@ struct LibraryView: View {
     }
     
     var body: some View {
+        let _ = localizationManager.currentLanguage
         NavigationView {
             ZStack {
                 // Фоновый градиент
@@ -397,12 +399,12 @@ struct LibraryView: View {
                 
                 ScrollView {
                     VStack(alignment: .leading) {
-                        Text("Your Library")
-                            .font(.system(size: 22, weight: .bold))
-                            .foregroundColor(Color("playerControls"))
-                            .padding(.horizontal)
-                            .padding(.top, 10)
-                            .padding(.bottom, 4)
+                        //                         Text(localizationManager.localizedString(forKey: "library"))
+                        //                             .font(.system(size: 22, weight: .bold))
+                        //                             .foregroundColor(Color("playerControls"))
+                        //                             .padding(.horizontal)
+                        //                             .padding(.top, 10)
+                        //                             .padding(.bottom, 4)
                         
                         LazyVGrid(columns: columns, spacing: 16) {
                             ForEach(playlists) { playlist in
@@ -420,11 +422,11 @@ struct LibraryView: View {
                     }
                 }
             }
-            .navigationTitle("Library")
+            .navigationTitle(localizationManager.localizedString(forKey: "library"))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .principal) {
-                    Text("Library")
+                    Text(localizationManager.localizedString(forKey: "library"))
                         .foregroundColor(Color("playerControls"))
                         .font(.headline)
                 }
@@ -452,10 +454,10 @@ struct LibraryView: View {
                 showAlert = true
             }
         }
-        .alert("Import Error", isPresented: $showAlert) {
-            Button("OK") {}
+        .alert(localizationManager.localizedString(forKey: "Import Error"), isPresented: $showAlert) {
+            Button(localizationManager.localizedString(forKey: "OK")) {}
         } message: {
-            Text(importError?.localizedDescription ?? "Unknown error occurred")
+            Text(importError?.localizedDescription ?? localizationManager.localizedString(forKey: "Unknown error occurred"))
         }
     }
 }

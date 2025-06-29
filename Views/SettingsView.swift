@@ -9,6 +9,7 @@ import SwiftUI
 
 struct SettingsView: View {
     @EnvironmentObject private var themeManager: ThemeManager
+    @EnvironmentObject private var localizationManager: LocalizationManager
     @StateObject private var dynamicBackgroundManager = DynamicBackgroundManager.shared
     @StateObject private var audioManager = AudioManager.shared
     @AppStorage("isDarkMode") private var isDarkMode = false
@@ -18,8 +19,13 @@ struct SettingsView: View {
     @AppStorage("isPlaybackSpeedEnabled") private var isPlaybackSpeedEnabled = false
     @AppStorage("playbackSpeed") private var playbackSpeed = 1.0
     @AppStorage("skipSilenceAtEnd") private var skipSilenceAtEnd = false
+    @AppStorage("selectedLanguage") private var selectedLanguage: String = Locale.current.languageCode ?? "en"
+    @State private var feedbackText: String = ""
+    @State private var showFeedbackAlert = false
+    @State private var showFeedback = false
     
     var body: some View {
+        let _ = localizationManager.currentLanguage
         NavigationView {
             ZStack {
                 // Background gradient
@@ -35,7 +41,7 @@ struct SettingsView: View {
                 
                 VStack {
                     List {
-                        Section(header: Text("Theme")) {
+                        Section(header: Text(localizationManager.localizedString(forKey: "theme"))) {
                             Menu {
                                 ForEach(ThemeMode.allCases, id: \.rawValue) { mode in
                                     Button(action: {
@@ -53,7 +59,7 @@ struct SettingsView: View {
                                         .imageScale(.large)
                                         .frame(width: 30, height: 30)
                                     VStack(alignment: .leading) {
-                                        Text("Theme")
+                                        Text(localizationManager.localizedString(forKey: "theme"))
                                             .fontWeight(.medium)
                                         Text(themeManager.themeMode.description)
                                             .font(.caption)
@@ -67,7 +73,26 @@ struct SettingsView: View {
                         }
                         .listRowBackground(Color.clear)
                         
-                        Section(header: Text("Dynamic Background")) {
+                        Section(header: Text(localizationManager.localizedString(forKey: "language"))) {
+                            Picker(selection: $selectedLanguage, label: HStack {
+                                Image(systemName: "globe")
+                                    .foregroundColor(.blue)
+                                    .imageScale(.large)
+                                    .frame(width: 30, height: 30)
+                                Text(localizationManager.localizedString(forKey: "language"))
+                                    .fontWeight(.medium)
+                            }) {
+                                Text(localizationManager.localizedString(forKey: "english")).tag("en")
+                                Text(localizationManager.localizedString(forKey: "ukrainian")).tag("uk")
+                            }
+                            .pickerStyle(.menu)
+                            .onChange(of: selectedLanguage) { lang in
+                                LocalizationManager.shared.setLanguage(lang)
+                            }
+                        }
+                        .listRowBackground(Color.clear)
+                        
+                        Section(header: Text(localizationManager.localizedString(forKey: "dynamic_background"))) {
                             Toggle(isOn: $dynamicBackgroundManager.isDynamicBackgroundEnabled) {
                                 HStack {
                                     Image(systemName: "paintpalette")
@@ -76,7 +101,7 @@ struct SettingsView: View {
                                         .frame(width: 30, height: 30)
                                     
                                     VStack(alignment: .leading) {
-                                        Text("Dynamic Background")
+                                        Text("dynamic_background".localized)
                                             .fontWeight(.medium)
                                         
                                         Text("Background color changes with album art")
@@ -88,8 +113,8 @@ struct SettingsView: View {
                         }
                         .listRowBackground(Color.clear)
                         
-                        Section(header: Text("Пропуск тиші")) {
-                            Toggle("Пропускати тишу в кінці", isOn: $skipSilenceAtEnd)
+                        Section(header: Text("skip_silence".localized)) {
+                            Toggle("skip_silence".localized, isOn: $skipSilenceAtEnd)
                                 .onChange(of: skipSilenceAtEnd) { newValue in
                                     print("⚙️ Skip silence setting changed to: \(newValue)")
                                     audioManager.skipSilenceAtEnd = newValue
@@ -101,16 +126,34 @@ struct SettingsView: View {
                             .listRowBackground(Color.clear)
                         }
                         
-                        Section(header: Text("About")) {
+                        Section(header: Text("about".localized)) {
                             HStack {
                                 Image(systemName: "music.note")
                                     .foregroundColor(.blue)
                                     .imageScale(.large)
                                     .frame(width: 30, height: 30)
-                                
-                                Text("FlexMusic Version 1.0")
+                                Text("version".localized)
                                     .fontWeight(.medium)
+                                Spacer()
+                                Text(Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.0")
+                                    .foregroundColor(.secondary)
+                                    .font(.caption)
                             }
+                            .listRowBackground(Color.clear)
+                            Button(action: { showFeedback = true }) {
+                                HStack {
+                                    Image(systemName: "envelope")
+                                        .foregroundColor(.blue)
+                                        .imageScale(.large)
+                                        .frame(width: 30, height: 30)
+                                    Text("Зворотний зв'язок")
+                                        .fontWeight(.medium)
+                                    Spacer()
+                                    Image(systemName: "chevron.right")
+                                        .foregroundColor(.secondary)
+                                }
+                            }
+                            .buttonStyle(.plain)
                             .listRowBackground(Color.clear)
                         }
                     }
@@ -118,15 +161,39 @@ struct SettingsView: View {
                     .scrollContentBackground(.hidden)
                 }
             }
-            .navigationTitle("Settings")
+            .navigationTitle("settings".localized)
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .principal) {
-                    Text("Settings")
+                    Text("settings".localized)
                         .foregroundColor(Color("playerControls"))
                         .font(.headline)
                 }
             }
+            .alert("Не вдалося відкрити поштовий клієнт", isPresented: $showFeedbackAlert) {
+                Button("OK", role: .cancel) { }
+            }
+        }
+        .sheet(isPresented: $showFeedback) {
+            FeedbackView()
+        }
+    }
+    
+    private func sendFeedback() {
+        let email = "ieremiay@gmail.com"
+        let subject = "Відгук про FlexMusic"
+        let trimmed = feedbackText.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmed.isEmpty else { return }
+        let subjectEncoded = subject.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? ""
+        let bodyEncoded = trimmed.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? ""
+        let mailto = "mailto:\(email)?subject=\(subjectEncoded)&body=\(bodyEncoded)"
+        if let url = URL(string: mailto) {
+            UIApplication.shared.open(url) { success in
+                if success { feedbackText = "" }
+                else { showFeedbackAlert = true }
+            }
+        } else {
+            showFeedbackAlert = true
         }
     }
 }

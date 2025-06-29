@@ -41,7 +41,7 @@ class AudioManager: NSObject, ObservableObject {
     private var silenceCount: Int = 0 // Лічильник перевірок тиші
     private let silenceLimit: Int = 30 // Кількість перевірок тиші для перемикання
     private let silenceCheckInterval: TimeInterval = 0.05 // Інтервал перевірки тиші
-    private let silenceCheckStartTime: TimeInterval = 10.0 // Початок перевірки тиші за 10 секунд до кінця
+    private let silenceCheckStartTime: TimeInterval = 20.0 // Початок перевірки тиші за 10 секунд до кінця
     
     private override init() {
         super.init()
@@ -196,8 +196,12 @@ class AudioManager: NSObject, ObservableObject {
             let averagePower = player.averagePower(forChannel: 0)
             let linearPower = pow(10, averagePower / 20)
             let timeUntilEnd = player.duration - player.currentTime
-            
-            self.processAudioLevel(linearPower, timeRemaining: timeUntilEnd)
+
+            if timeUntilEnd <= self.silenceCheckStartTime {
+                self.processAudioLevel(linearPower, timeRemaining: timeUntilEnd)
+            } else {
+                self.silenceCount = 0 // скидаємо лічильник, щоб не накопичувалась тиша
+            }
         }
     }
     

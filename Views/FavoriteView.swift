@@ -11,6 +11,7 @@ import CoreData
 
 struct FavoriteView: View {
     @Environment(\.managedObjectContext) private var viewContext
+    @EnvironmentObject private var localizationManager: LocalizationManager
     @FetchRequest(
         sortDescriptors: [NSSortDescriptor(keyPath: \Song.title, ascending: true)],
         predicate: NSPredicate(format: "isFavorite == YES"),
@@ -49,6 +50,7 @@ struct FavoriteView: View {
     ]
     
     var body: some View {
+        let _ = localizationManager.currentLanguage
         NavigationView {
             ZStack {
                 // Background gradient
@@ -76,13 +78,13 @@ struct FavoriteView: View {
                                         Button(role: .destructive) {
                                             deleteFavoritePlaylist(playlist)
                                         } label: {
-                                            Label("Видалити", systemImage: "trash")
+                                            Label(localizationManager.localizedString(forKey: "delete"), systemImage: "trash")
                                         }
                                         Button {
                                             renameText = playlist.name?.replacingOccurrences(of: "★ ", with: "") ?? ""
                                             renamingPlaylist = playlist
                                         } label: {
-                                            Label("Перейменувати", systemImage: "pencil")
+                                            Label(localizationManager.localizedString(forKey: "rename_playlist"), systemImage: "pencil")
                                         }
                                     }
                                 }
@@ -99,10 +101,10 @@ struct FavoriteView: View {
                             Image(systemName: "heart.slash")
                                 .font(.system(size: 60))
                                 .foregroundColor(Color("playerControls").opacity(0.7))
-                            Text("No Favorite Songs")
+                            Text(localizationManager.localizedString(forKey: "no_favorite_songs"))
                                 .font(.title2)
                                 .foregroundColor(Color("playerControls"))
-                            Text("Add songs to your favorites from the Library")
+                            Text(localizationManager.localizedString(forKey: "add_songs_to_favorites"))
                                 .font(.subheadline)
                                 .foregroundColor(Color("playerControls").opacity(0.7))
                                 .multilineTextAlignment(.center)
@@ -132,7 +134,7 @@ struct FavoriteView: View {
                                         if !favoritePlaylists.isEmpty {
                                             Menu {
                                                 ForEach(favoritePlaylists) { playlist in
-                                                    Button("Додати до \(playlist.name?.replacingOccurrences(of: "★ ", with: "") ?? "Плейліст")") {
+                                                    Button(localizationManager.localizedString(forKey: "add_to_playlist") + " \(playlist.name?.replacingOccurrences(of: "★ ", with: "") ?? "Плейліст")") {
                                                         addSong(song, to: playlist)
                                                     }
                                                 }
@@ -150,11 +152,11 @@ struct FavoriteView: View {
                     }
                 }
             }
-            .navigationTitle("Favorites")
+            .navigationTitle(localizationManager.localizedString(forKey: "favorites"))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .principal) {
-                    Text("Favorites")
+                    Text(localizationManager.localizedString(forKey: "favorites"))
                         .foregroundColor(Color("playerControls"))
                         .font(.headline)
                 }
@@ -182,28 +184,28 @@ struct FavoriteView: View {
                 }
             }
         }
-        .alert("Новий плейліст", isPresented: $showingAddPlaylist) {
-            TextField("Назва плейліста", text: $newPlaylistName)
-            Button("Скасувати", role: .cancel) {
+        .alert(localizationManager.localizedString(forKey: "new_playlist"), isPresented: $showingAddPlaylist) {
+            TextField(localizationManager.localizedString(forKey: "new_playlist"), text: $newPlaylistName)
+            Button(localizationManager.localizedString(forKey: "cancel"), role: .cancel) {
                 newPlaylistName = ""
             }
-            Button("Створити") {
+            Button(localizationManager.localizedString(forKey: "create")) {
                 if !newPlaylistName.trimmingCharacters(in: .whitespaces).isEmpty {
                     addFavoritePlaylist(name: newPlaylistName)
                     newPlaylistName = ""
                 }
             }
         }
-        .alert("Перейменувати плейліст", isPresented: Binding<Bool>(
+        .alert(localizationManager.localizedString(forKey: "rename_playlist"), isPresented: Binding<Bool>(
             get: { renamingPlaylist != nil },
             set: { if !$0 { renamingPlaylist = nil } }
         ), actions: {
-            TextField("Нова назва", text: $renameText)
-            Button("Скасувати", role: .cancel) {
+            TextField(localizationManager.localizedString(forKey: "rename_playlist"), text: $renameText)
+            Button(localizationManager.localizedString(forKey: "cancel"), role: .cancel) {
                 renamingPlaylist = nil
                 renameText = ""
             }
-            Button("Зберегти") {
+            Button(localizationManager.localizedString(forKey: "save")) {
                 if let playlist = renamingPlaylist {
                     let trimmed = renameText.trimmingCharacters(in: .whitespacesAndNewlines)
                     if !trimmed.isEmpty {
@@ -219,7 +221,7 @@ struct FavoriteView: View {
                 renameText = ""
             }
         }, message: {
-            Text("Введіть нову назву для плейліста")
+            Text(localizationManager.localizedString(forKey: "enter_new_name"))
         })
     }
     
