@@ -238,6 +238,7 @@ struct PlayerView: View {
     private var progressBarView: some View {
         VStack(spacing: 8) {
             GeometryReader { geometry in
+                let progress = (audioManager.totalTime > 0) ? CGFloat(audioManager.currentTime / audioManager.totalTime) : 0
                 ZStack(alignment: .leading) {
                     Rectangle()
                         .fill(dynamicBackgroundManager.isDynamicBackgroundEnabled ? dynamicBackgroundManager.controlButtonColor.opacity(0.1) : Color("playerControls").opacity(0.1))
@@ -255,14 +256,14 @@ struct PlayerView: View {
                                 endPoint: .trailing
                             )
                         )
-                        .frame(width: geometry.size.width * CGFloat(audioManager.currentTime / audioManager.totalTime), height: 4)
+                        .frame(width: geometry.size.width * progress, height: 4)
                         .cornerRadius(2)
                     
                     Circle()
                         .fill(dynamicBackgroundManager.isDynamicBackgroundEnabled ? dynamicBackgroundManager.controlButtonColor.opacity(0.5) : Color("playerControls").opacity(0.5))
                         .frame(width: 12, height: 12)
                         .shadow(color: .black.opacity(0.3), radius: 2, x: 0, y: 1)
-                        .offset(x: geometry.size.width * CGFloat(audioManager.currentTime / audioManager.totalTime) - 6)
+                        .offset(x: geometry.size.width * progress - 6)
                 }
                 .gesture(
                     DragGesture(minimumDistance: 0)
