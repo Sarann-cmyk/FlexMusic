@@ -44,27 +44,23 @@ struct SongRow: View {
                     .font(.system(size: 16, weight: .semibold))
                     .foregroundColor(Color("playerControls"))
                     .lineLimit(1)
-                
                 Text(song.artist ?? "Unknown Artist")
                     .font(.system(size: 14))
                     .foregroundColor(Color("playerControls").opacity(0.7))
                     .lineLimit(1)
-                
                 HStack {
                     // Duration
                     Text(formatDuration(song.duration))
                         .font(.system(size: 13))
                         .foregroundColor(Color("playerControls").opacity(0.5))
-                    
                     Spacer()
-                    
-                    // Favorite Indicator
-                    if songObject.isFavorite {
-                        Image(systemName: "heart.fill")
-                            .foregroundColor(.pink)
-                            .font(.system(size: 14))
-                    }
                 }
+            }
+            Spacer()
+            if songObject.isFavorite {
+                Image(systemName: "heart.fill")
+                    .foregroundColor(.red)
+                    .font(.system(size: 18))
             }
         }
         .frame(maxWidth: .infinity, alignment: .leading)

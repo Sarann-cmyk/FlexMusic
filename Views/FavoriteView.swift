@@ -226,7 +226,14 @@ struct FavoriteView: View {
     }
     
     private func addSong(_ song: Song, to playlist: Playlist) {
-        playlist.addToSongs(song)
+        // Перевіряємо, чи вже існує Song з таким filePath
+        let request = Song.fetchRequest()
+        request.predicate = NSPredicate(format: "filePath == %@", song.filePath ?? "")
+        if let existingSong = try? viewContext.fetch(request).first {
+            playlist.addToSongs(existingSong)
+        } else {
+            playlist.addToSongs(song)
+        }
         do {
             try viewContext.save()
         } catch {

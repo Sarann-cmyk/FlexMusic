@@ -20,13 +20,11 @@ class LocalizationManager: ObservableObject {
     
     func setLanguage(_ lang: String) {
         guard currentLanguage != lang else { return }
-        print("[LocalizationManager] Changing language from \(currentLanguage) to \(lang)")
         currentLanguage = lang
     }
     
     func localizedString(forKey key: String) -> String {
         let value = bundle.localizedString(forKey: key, value: nil, table: nil)
-        print("[LocalizationManager] key: \(key), lang: \(currentLanguage), value: \(value)")
         return value
     }
 }

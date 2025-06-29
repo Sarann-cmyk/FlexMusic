@@ -142,7 +142,7 @@ struct LibraryView: View {
                 Button(role: .destructive) {
                     deletePlaylist(playlist)
                 } label: {
-                    Label("Delete", systemImage: "trash")
+                    Label(localizationManager.localizedString(forKey: "delete"), systemImage: "trash")
                 }
             }
             
@@ -262,14 +262,12 @@ struct LibraryView: View {
             throw ImportError.fileAccessDenied
         }
         defer { url.stopAccessingSecurityScopedResource() }
-        
         let request = Song.fetchRequest()
         request.predicate = NSPredicate(format: "filePath == %@", url.path)
         if let existingSong = try? viewContext.fetch(request).first {
             playlist.addToSongs(existingSong)
             return
         }
-        
         let bookmarkData = try url.bookmarkData(options: .minimalBookmark, includingResourceValuesForKeys: nil, relativeTo: nil)
         let newSong = Song(context: viewContext)
         newSong.title = url.lastPathComponent

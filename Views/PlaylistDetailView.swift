@@ -213,14 +213,12 @@ struct PlaylistDetailView: View {
             throw ImportError.fileAccessDenied
         }
         defer { url.stopAccessingSecurityScopedResource() }
-        
         let request = Song.fetchRequest()
         request.predicate = NSPredicate(format: "filePath == %@", url.path)
         if let existingSong = try? viewContext.fetch(request).first {
             playlist.addToSongs(existingSong)
             return
         }
-        
         let bookmarkData = try url.bookmarkData(options: .minimalBookmark, includingResourceValuesForKeys: nil, relativeTo: nil)
         let newSong = Song(context: viewContext)
         newSong.title = url.lastPathComponent
@@ -362,21 +360,14 @@ struct PlaylistDetailView: View {
     
     private func removeFromPlaylist(_ song: Song) {
         withAnimation {
-            if song.isFavorite {
-                song.isFavorite = false
-            }
-            
             playlist.removeFromSongs(song)
-            
             let request = NSFetchRequest<Playlist>(entityName: "Playlist")
             request.predicate = NSPredicate(format: "ANY songs == %@", song)
-            
             do {
                 let playlists = try viewContext.fetch(request)
                 if playlists.isEmpty {
                     viewContext.delete(song)
                 }
-                
                 try viewContext.save()
                 songs = playlist.songsArray
             } catch {
