@@ -1,3 +1,11 @@
+//
+//  FlexMusicApp.swift
+//  FlexMusic
+//
+//  Created by Aleks Synelnyk on 18.03.2025.
+//
+
+
 import Foundation
 import SwiftUI
 

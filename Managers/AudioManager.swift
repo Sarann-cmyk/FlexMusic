@@ -53,9 +53,49 @@ class AudioManager: NSObject, ObservableObject {
         do {
             try AVAudioSession.sharedInstance().setCategory(.playback, mode: .default)
             try AVAudioSession.sharedInstance().setActive(true)
+            NotificationCenter.default.addObserver(
+                self,
+                selector: #selector(handleAudioSessionInterruption),
+                name: AVAudioSession.interruptionNotification,
+                object: AVAudioSession.sharedInstance()
+            )
         } catch {
             print("Failed to set up audio session: \(error)")
         }
+    }
+    
+    @objc private func handleAudioSessionInterruption(_ notification: Notification) {
+        guard let userInfo = notification.userInfo,
+              let typeValue = userInfo[AVAudioSessionInterruptionTypeKey] as? UInt,
+              let type = AVAudioSession.InterruptionType(rawValue: typeValue) else {
+            return
+        }
+
+        switch type {
+        case .began:
+            if isPlaying {
+                player?.pause()
+                stopTimer()
+                silenceDetectionTimer?.invalidate()
+            }
+        case .ended:
+            if let optionsValue = userInfo[AVAudioSessionInterruptionOptionKey] as? UInt {
+                let options = AVAudioSession.InterruptionOptions(rawValue: optionsValue)
+                if options.contains(.shouldResume) && isPlaying {
+                    player?.play()
+                    startTimer()
+                    if skipSilenceAtEnd {
+                        startSilenceDetection()
+                    }
+                }
+            }
+        @unknown default:
+            break
+        }
+    }
+    
+    deinit {
+        NotificationCenter.default.removeObserver(self)
     }
     
     private func setupAudioPlayer() {

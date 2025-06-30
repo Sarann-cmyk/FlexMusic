@@ -96,41 +96,41 @@ struct FavoriteView: View {
                     }
                     
                     // Основний контент
-                    if songs.isEmpty {
-                        VStack(spacing: 20) {
-                            Image(systemName: "heart.slash")
-                                .font(.system(size: 60))
-                                .foregroundColor(Color("playerControls").opacity(0.7))
+                if songs.isEmpty {
+                    VStack(spacing: 20) {
+                        Image(systemName: "heart.slash")
+                            .font(.system(size: 60))
+                            .foregroundColor(Color("playerControls").opacity(0.7))
                             Text(localizationManager.localizedString(forKey: "no_favorite_songs"))
-                                .font(.title2)
-                                .foregroundColor(Color("playerControls"))
+                            .font(.title2)
+                            .foregroundColor(Color("playerControls"))
                             Text(localizationManager.localizedString(forKey: "add_songs_to_favorites"))
-                                .font(.subheadline)
-                                .foregroundColor(Color("playerControls").opacity(0.7))
-                                .multilineTextAlignment(.center)
-                                .padding(.horizontal)
-                        }
-                    } else {
-                        List {
+                            .font(.subheadline)
+                            .foregroundColor(Color("playerControls").opacity(0.7))
+                            .multilineTextAlignment(.center)
+                            .padding(.horizontal)
+                    }
+                } else {
+                    List {
                             ForEach(sortedUngroupedFavoriteSongs, id: \.self) { song in
-                                SongRow(song: song)
-                                    .contentShape(Rectangle())
-                                    .listRowBackground(Color.clear)
-                                    .listRowInsets(EdgeInsets(top: 4, leading: 5, bottom: 4, trailing: 5))
-                                    .frame(height: 60)
-                                    .onTapGesture {
-                                        PlaylistManager.shared.setPlaylist(Array(songs))
-                                        AudioManager.shared.playSong(song)
+                            SongRow(song: song)
+                                .contentShape(Rectangle())
+                                .listRowBackground(Color.clear)
+                                .listRowInsets(EdgeInsets(top: 4, leading: 5, bottom: 4, trailing: 5))
+                                .frame(height: 60)
+                                .onTapGesture {
+                                    PlaylistManager.shared.setPlaylist(Array(songs))
+                                    AudioManager.shared.playSong(song)
                                         selectedTab = 1
+                                }
+                                .swipeActions(edge: .trailing, allowsFullSwipe: false) {
+                                    Button {
+                                        toggleFavorite(song)
+                                    } label: {
+                                        Image(systemName: song.isFavorite ? "heart.slash" : "heart.fill")
+                                            .font(.system(size: 12))
                                     }
-                                    .swipeActions(edge: .trailing, allowsFullSwipe: false) {
-                                        Button {
-                                            toggleFavorite(song)
-                                        } label: {
-                                            Image(systemName: song.isFavorite ? "heart.slash" : "heart.fill")
-                                                .font(.system(size: 12))
-                                        }
-                                        .tint(song.isFavorite ? .red : .pink)
+                                    .tint(song.isFavorite ? .red : .pink)
                                         if !favoritePlaylists.isEmpty {
                                             Menu {
                                                 ForEach(favoritePlaylists) { playlist in
@@ -142,15 +142,15 @@ struct FavoriteView: View {
                                                 Image(systemName: "text.badge.plus")
                                             }
                                         }
-                                    }
-                            }
-                            .onDelete(perform: removeFromFavorites)
+                                }
                         }
-                        .listStyle(PlainListStyle())
-                        .scrollContentBackground(.hidden)
-                        .frame(maxWidth: .infinity)
+                        .onDelete(perform: removeFromFavorites)
                     }
+                    .listStyle(PlainListStyle())
+                    .scrollContentBackground(.hidden)
+                    .frame(maxWidth: .infinity)
                 }
+            }
             }
             .navigationTitle(localizationManager.localizedString(forKey: "favorites"))
             .navigationBarTitleDisplayMode(.inline)
@@ -166,8 +166,8 @@ struct FavoriteView: View {
                             ForEach(TrackSortOption.allCases, id: \.self) { option in
                                 Button(option.rawValue) {
                                     sortOption = option
-                                }
-                            }
+            }
+        }
                         } label: {
                             Image(systemName: "arrow.up.arrow.down")
                                 .font(.system(size: 18, weight: .regular))

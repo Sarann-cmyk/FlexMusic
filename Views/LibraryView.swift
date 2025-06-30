@@ -375,7 +375,7 @@ struct LibraryView: View {
         
         while cleanName.contains("  ") {
             cleanName = cleanName.replacingOccurrences(of: "  ", with: " ")
-        }
+            }
         
         return cleanName.trimmingCharacters(in: .whitespacesAndNewlines)
     }

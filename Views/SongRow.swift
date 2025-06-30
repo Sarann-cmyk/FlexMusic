@@ -57,8 +57,8 @@ struct SongRow: View {
                 }
             }
             Spacer()
-            if songObject.isFavorite {
-                Image(systemName: "heart.fill")
+                    if songObject.isFavorite {
+                        Image(systemName: "heart.fill")
                     .foregroundColor(.red)
                     .font(.system(size: 18))
             }
