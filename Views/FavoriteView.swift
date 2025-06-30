@@ -166,8 +166,8 @@ struct FavoriteView: View {
                             ForEach(TrackSortOption.allCases, id: \.self) { option in
                                 Button(option.rawValue) {
                                     sortOption = option
-            }
-        }
+                                }
+                            }
                         } label: {
                             Image(systemName: "arrow.up.arrow.down")
                                 .font(.system(size: 18, weight: .regular))
@@ -223,7 +223,10 @@ struct FavoriteView: View {
         }, message: {
             Text(localizationManager.localizedString(forKey: "enter_new_name"))
         })
+        
+        .navigationViewStyle(StackNavigationViewStyle())
     }
+   
     
     private func addSong(_ song: Song, to playlist: Playlist) {
         // Перевіряємо, чи вже існує Song з таким filePath

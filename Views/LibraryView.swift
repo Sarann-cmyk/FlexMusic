@@ -439,6 +439,7 @@ struct LibraryView: View {
                 }
             }
         }
+        .navigationViewStyle(StackNavigationViewStyle())
         .fileImporter(
             isPresented: $showFileImporter,
             allowedContentTypes: [.audio],

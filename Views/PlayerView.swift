@@ -203,6 +203,7 @@ struct PlayerView: View {
                 .presentationBackground(Material.ultraThin)
             }
         }
+        .navigationViewStyle(StackNavigationViewStyle())
         .onAppear {
             if isInitialLoad {
                 isInitialLoad = false

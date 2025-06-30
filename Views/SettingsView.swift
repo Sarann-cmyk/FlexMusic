@@ -174,6 +174,7 @@ struct SettingsView: View {
                 Button("OK", role: .cancel) { }
             }
         }
+        .navigationViewStyle(StackNavigationViewStyle())
         .sheet(isPresented: $showFeedback) {
             FeedbackView()
         }
