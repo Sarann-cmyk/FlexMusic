@@ -42,6 +42,7 @@ extension Color {
 struct LibraryView: View {
     @Environment(\.managedObjectContext) private var viewContext
     @EnvironmentObject private var localizationManager: LocalizationManager
+    @EnvironmentObject private var storeKitManager: StoreKitManager
     @FetchRequest(
         sortDescriptors: [NSSortDescriptor(keyPath: \Playlist.createdAt, ascending: false)],
         predicate: NSPredicate(format: "NOT (name BEGINSWITH[c] %@)", "★ "),
@@ -54,6 +55,13 @@ struct LibraryView: View {
     @State private var showFileImporter = false
     @State private var importError: Error?
     @State private var showAlert = false
+    @State private var showPurchaseAlert = false
+    @State private var showRestoreAlert = false
+    @State private var restoreMessage = ""
+    
+    private var hasFullAccess: Bool {
+        storeKitManager.purchasedProductIDs.contains("com.flexmusic.fullaccess")
+    }
     
     // Налаштування для сітки плейлистів
     private let columns = [
@@ -69,6 +77,10 @@ struct LibraryView: View {
     }
     
     private func addPlaylist(name: String) {
+        if !hasFullAccess && playlists.count >= 1 {
+            showPurchaseAlert = true
+            return
+        }
         withAnimation {
             let newPlaylist = Playlist(context: viewContext)
             newPlaylist.id = UUID()
@@ -223,6 +235,10 @@ struct LibraryView: View {
     }
     
     private func handlePlaylistCreation(with urls: [URL]) {
+        if !hasFullAccess && playlists.count >= 1 {
+            showPurchaseAlert = true
+            return
+        }
         guard !urls.isEmpty else { return }
         let parentFolders = Set(urls.map { $0.deletingLastPathComponent().lastPathComponent })
         let playlistName: String
@@ -235,6 +251,10 @@ struct LibraryView: View {
     }
     
     private func addPlaylistWithSongs(name: String, urls: [URL]) {
+        if !hasFullAccess && playlists.count >= 1 {
+            showPurchaseAlert = true
+            return
+        }
         let newPlaylist = Playlist(context: viewContext)
         newPlaylist.id = UUID()
         newPlaylist.name = name
@@ -423,6 +443,7 @@ struct LibraryView: View {
             .navigationTitle(localizationManager.localizedString(forKey: "library"))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
+                // Видалено ToolbarItem(placement: .navigationBarLeading) для відновлення покупки
                 ToolbarItem(placement: .principal) {
                     Text(localizationManager.localizedString(forKey: "library"))
                         .foregroundColor(Color("playerControls"))
@@ -457,6 +478,19 @@ struct LibraryView: View {
             Button(localizationManager.localizedString(forKey: "OK")) {}
         } message: {
             Text(importError?.localizedDescription ?? localizationManager.localizedString(forKey: "Unknown error occurred"))
+        }
+        .alert("Повна версія", isPresented: $showPurchaseAlert) {
+            Button("Купити") {
+                if let product = storeKitManager.products.first(where: { $0.productIdentifier == "com.flexmusic.fullaccess" }) {
+                    storeKitManager.purchase(product)
+                }
+            }
+            Button("Скасувати", role: .cancel) {}
+        } message: {
+            Text("Щоб додати більше одного плейлиста, потрібно купити повну версію.")
+        }
+        .alert(restoreMessage, isPresented: $showRestoreAlert) {
+            Button("OK", role: .cancel) {}
         }
     }
 }

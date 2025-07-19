@@ -13,6 +13,7 @@ struct FlexMusicApp: App {
     let persistenceController = PersistenceController.shared
     @StateObject private var themeManager = ThemeManager.shared
     @StateObject private var localizationManager = LocalizationManager.shared
+    @StateObject private var storeKitManager = StoreKitManager()
     
     init() {
         // Налаштування навігаційної панелі
@@ -28,6 +29,7 @@ struct FlexMusicApp: App {
                 .preferredColorScheme(themeManager.colorScheme)
                 .environmentObject(themeManager)
                 .environmentObject(localizationManager)
+                .environmentObject(storeKitManager)
         }
     }
 }

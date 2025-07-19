@@ -12,6 +12,7 @@ import CoreData
 struct FavoriteView: View {
     @Environment(\.managedObjectContext) private var viewContext
     @EnvironmentObject private var localizationManager: LocalizationManager
+    @EnvironmentObject private var storeKitManager: StoreKitManager
     @FetchRequest(
         sortDescriptors: [NSSortDescriptor(keyPath: \Song.title, ascending: true)],
         predicate: NSPredicate(format: "isFavorite == YES"),
@@ -31,6 +32,7 @@ struct FavoriteView: View {
     @State private var renamingPlaylist: Playlist? = nil
     @State private var renameText: String = ""
     @State private var sortOption: TrackSortOption = .dateAdded
+    @State private var showPurchaseAlert = false
     
     private var ungroupedFavoriteSongs: [Song] {
         songs.filter { song in
@@ -42,6 +44,10 @@ struct FavoriteView: View {
     
     private var sortedUngroupedFavoriteSongs: [Song] {
         TrackSortManager.sort(songs: ungroupedFavoriteSongs, by: sortOption)
+    }
+    
+    private var hasFullAccess: Bool {
+        storeKitManager.purchasedProductIDs.contains("com.flexmusic.fullaccess")
     }
     
     // Додаю параметри для сітки плейлістів
@@ -223,6 +229,16 @@ struct FavoriteView: View {
         }, message: {
             Text(localizationManager.localizedString(forKey: "enter_new_name"))
         })
+        .alert(localizationManager.localizedString(forKey: "playlist_limit_title"), isPresented: $showPurchaseAlert) {
+            Button(localizationManager.localizedString(forKey: "buy")) {
+                if let product = storeKitManager.products.first(where: { $0.productIdentifier == "com.flexmusic.fullaccess" }) {
+                    storeKitManager.purchase(product)
+                }
+            }
+            Button(localizationManager.localizedString(forKey: "cancel"), role: .cancel) {}
+        } message: {
+            Text(localizationManager.localizedString(forKey: "playlist_limit_message"))
+        }
         
         .navigationViewStyle(StackNavigationViewStyle())
     }
@@ -245,6 +261,10 @@ struct FavoriteView: View {
     }
     
     private func addFavoritePlaylist(name: String) {
+        if !hasFullAccess && favoritePlaylists.count >= 1 {
+            showPurchaseAlert = true
+            return
+        }
         let playlist = Playlist(context: viewContext)
         playlist.id = UUID()
         playlist.name = "★ " + name

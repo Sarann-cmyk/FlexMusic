@@ -28,4 +28,11 @@
 "no_songs_in_playlist" = "No songs in playlist";
 "tap_plus_to_add_songs" = "Tap the + button to add songs";
 "now_playing" = "Now Playing";
-"feedback" = "Feedback"; 
+"feedback" = "Feedback";
+"full_version" = "Full version";
+"free_version" = "Free version";
+"restore_purchase" = "Restore Purchase";
+"restore_purchase_message" = "A restore request has been sent. If you had a purchase, it will be activated.";
+"playlist_limit_title" = "Full version";
+"playlist_limit_message" = "To add more than one playlist, you need to purchase the full version.";
+"buy" = "Buy"; 

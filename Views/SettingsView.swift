@@ -10,6 +10,7 @@ import SwiftUI
 struct SettingsView: View {
     @EnvironmentObject private var themeManager: ThemeManager
     @EnvironmentObject private var localizationManager: LocalizationManager
+    @EnvironmentObject private var storeKitManager: StoreKitManager
     @StateObject private var dynamicBackgroundManager = DynamicBackgroundManager.shared
     @StateObject private var audioManager = AudioManager.shared
     @AppStorage("isDarkMode") private var isDarkMode = false
@@ -23,6 +24,8 @@ struct SettingsView: View {
     @State private var feedbackText: String = ""
     @State private var showFeedbackAlert = false
     @State private var showFeedback = false
+    @State private var showRestoreAlert = false
+    @State private var restoreMessage = ""
     
     var body: some View {
         let _ = localizationManager.currentLanguage
@@ -140,6 +143,35 @@ struct SettingsView: View {
                                     .font(.caption)
                             }
                             .listRowBackground(Color.clear)
+                            // Надпис про версію додатку
+                            HStack {
+                                Image(systemName: storeKitManager.purchasedProductIDs.contains("com.flexmusic.fullaccess") ? "checkmark.seal.fill" : "exclamationmark.triangle.fill")
+                                    .foregroundColor(storeKitManager.purchasedProductIDs.contains("com.flexmusic.fullaccess") ? .green : .orange)
+                                    .imageScale(.large)
+                                    .frame(width: 30, height: 30)
+                                Text(localizationManager.localizedString(forKey: storeKitManager.purchasedProductIDs.contains("com.flexmusic.fullaccess") ? "full_version" : "free_version"))
+                                    .fontWeight(.medium)
+                                Spacer()
+                            }
+                            .listRowBackground(Color.clear)
+                            // Кнопка для відновлення покупки
+                            Button(action: {
+                                storeKitManager.restorePurchases()
+                                restoreMessage = localizationManager.localizedString(forKey: "restore_purchase_message")
+                                showRestoreAlert = true
+                            }) {
+                                HStack {
+                                    Image(systemName: "arrow.clockwise")
+                                        .foregroundColor(.blue)
+                                        .imageScale(.large)
+                                        .frame(width: 30, height: 30)
+                                    Text(localizationManager.localizedString(forKey: "restore_purchase"))
+                                        .fontWeight(.medium)
+                                    Spacer()
+                                }
+                            }
+                            .buttonStyle(.plain)
+                            .listRowBackground(Color.clear)
                             Button(action: { showFeedback = true }) {
                                 HStack {
                                     Image(systemName: "envelope")
@@ -172,6 +204,9 @@ struct SettingsView: View {
             }
             .alert("Не вдалося відкрити поштовий клієнт", isPresented: $showFeedbackAlert) {
                 Button("OK", role: .cancel) { }
+            }
+            .alert(restoreMessage, isPresented: $showRestoreAlert) {
+                Button("OK", role: .cancel) {}
             }
         }
         .navigationViewStyle(StackNavigationViewStyle())
